@@ -8,15 +8,15 @@ import java.time.LocalDate;
 @Data
 public class User {
 
-    int id;
+    private int id;
     @NotNull(message = "Электронная почта не может быть пустой.")
     @Email(message = "Электронная почта должна быть корректного формата.")
-    String email;
+    private String email;
     @NotBlank(message = "Логин не может быть пустым.")
     @Pattern(regexp = "^[\\S]+$", message = "Логин не может содержать пробелы.")
-    String login;
-    String name;
+    private String login;
+    private String name;
     @Past(message = "Дата рождения не может быть больше текущей даты.")
-    LocalDate birthday;
+    private LocalDate birthday;
 
 }
