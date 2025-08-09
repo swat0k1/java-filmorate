@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;
 
@@ -28,7 +29,7 @@ public class UserTests {
         User user = new User();
         user.setEmail("test@test.ru");
         user.setLogin("test");
-        user.setBirthday(new Date(100, 1, 1));
+        user.setBirthday(LocalDate.of(2000, 1, 1));
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertTrue(violations.isEmpty());
@@ -39,7 +40,7 @@ public class UserTests {
         User user = new User();
         user.setEmail("какой то меил");
         user.setLogin("логин такой");
-        user.setBirthday(new Date(9999, 1, 1));
+        user.setBirthday(LocalDate.of(9999, 1, 1));
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());

@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.time.DurationMin;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 public class Film {
@@ -18,7 +18,7 @@ public class Film {
     @Size(max = 200, message = "Максимальная длина описания — 200 символов.")
     private String description;
     @PastOrPresent(message = "Дата релиза не может быть больше текущей даты.")
-    private Date releaseDate;
+    private LocalDate releaseDate;
     @DurationMin(message = "Продолжительность фильма должна быть положительным числом.", nanos = 1)
     private Duration duration;
 

@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,7 +30,7 @@ public class FilmTests {
         Film film = new Film();
         film.setName("TestName");
         film.setDescription("TestDescription");
-        film.setReleaseDate(new Date(100, 1, 1));
+        film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(Duration.ofMinutes(120));
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
@@ -46,7 +46,7 @@ public class FilmTests {
                 "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" +
                 "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" +
                 "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
-        film.setReleaseDate(new Date(2000, 1, 1));
+        film.setReleaseDate(LocalDate.of(9999, 1, 1));
         film.setDuration(Duration.ofMinutes(-10));
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);

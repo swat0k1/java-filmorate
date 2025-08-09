@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 public class User {
@@ -17,6 +17,6 @@ public class User {
     String login;
     String name;
     @Past(message = "Дата рождения не может быть больше текущей даты.")
-    Date birthday;
+    LocalDate birthday;
 
 }

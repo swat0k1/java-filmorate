@@ -10,7 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.LocalDate;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,7 +30,7 @@ public class FilmControllerTests {
         Film film = new Film();
         film.setName("Inception");
         film.setDescription("A mind-bending thriller.");
-        film.setReleaseDate(new Date(100, 1,1));
+        film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(Duration.ofMinutes(148));
 
         mockMvc.perform(post("/films")
@@ -47,7 +47,7 @@ public class FilmControllerTests {
                 "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" +
                 "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" +
                 "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
-        film.setReleaseDate(new Date());
+        film.setReleaseDate(LocalDate.now());
         film.setDuration(Duration.ofMinutes(120));
 
         mockMvc.perform(post("/films")

@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Optional;
 
 @Slf4j
@@ -68,7 +68,7 @@ public class UserService {
             throw new ValidationException("Логин не может быть пустым и содержать пробелы!");
         }
 
-        if (user.getBirthday() == null || user.getBirthday().after(new Date())) {
+        if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
             log.error("Ошибка валидации пользователя: дата рождения не может быть больше текущей даты или пустой.");
             throw new ValidationException("Дата рождения не может быть больше текущей даты или пустой!");
         }

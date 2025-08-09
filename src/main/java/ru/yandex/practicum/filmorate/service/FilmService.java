@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Optional;
 
 @Slf4j
@@ -68,7 +68,7 @@ public class FilmService {
             throw new ValidationException("Максимальная длина описания фильма - 200 символов!");
         }
 
-        if (film.getReleaseDate() == null || film.getReleaseDate().before(new Date(1895 - 1900, 11, 28))) {
+        if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(LocalDate.of(1895, 11, 28))) {
             log.error("Ошибка валидации фильма: дата релиза не может быть раньше 28 декабря 1895 года.");
             throw new ValidationException("Дата релиза фильма не может быть раньше 28.11.1895!");
         }
