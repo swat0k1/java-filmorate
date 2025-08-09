@@ -18,6 +18,9 @@ public class UserService {
 
     public User createUser(User user) {
         validateUser(user);
+        if ((user.getName() == null || user.getName().isEmpty()) && !user.getLogin().isEmpty()) {
+            user.setName(user.getLogin());
+        }
         user.setId(currentId);
         currentId++;
         users.add(user);
@@ -47,7 +50,9 @@ public class UserService {
 
         } else {
             log.warn("Пользователь с указанным id {} не был найден", id);
-            throw new ValidationException("Пользователь с таким id не найден.");
+            throw new ValidationException("{\n" +
+                    "    \"error\": \"Пользователь с таким id не найден.\"\n" +
+                    "}");
         }
 
     }
@@ -60,17 +65,23 @@ public class UserService {
 
         if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
             log.error("Ошибка валидации пользователя: электронная почта не может быть пустой и должна содержать символ '@'.");
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ '@'!");
+            throw new ValidationException("{\n" +
+                    "    \"error\": \"Электронная почта не может быть пустой и должна содержать символ '@'!\"\n" +
+                    "}");
         }
 
         if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
             log.error("Ошибка валидации пользователя: логин не может быть пустым и содержать пробелы.");
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы!");
+            throw new ValidationException("{\n" +
+                    "    \"error\": \"Логин не может быть пустым и содержать пробелы!\"\n" +
+                    "}");
         }
 
         if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
             log.error("Ошибка валидации пользователя: дата рождения не может быть больше текущей даты или пустой.");
-            throw new ValidationException("Дата рождения не может быть больше текущей даты или пустой!");
+            throw new ValidationException("{\n" +
+                    "    \"error\": \"Дата рождения не может быть больше текущей даты или пустой!\"\n" +
+                    "}");
         }
 
     }

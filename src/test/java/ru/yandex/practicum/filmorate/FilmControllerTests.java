@@ -31,7 +31,7 @@ public class FilmControllerTests {
         film.setName("Inception");
         film.setDescription("A mind-bending thriller.");
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
-        film.setDuration(Duration.ofMinutes(148));
+        film.setDuration(148);
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -48,7 +48,7 @@ public class FilmControllerTests {
                 "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" +
                 "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
         film.setReleaseDate(LocalDate.now());
-        film.setDuration(Duration.ofMinutes(120));
+        film.setDuration(120);
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)

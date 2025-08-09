@@ -47,7 +47,9 @@ public class FilmService {
 
         } else {
             log.warn("Фильм с указанным id {} не был найден", id);
-            throw new ValidationException("Фильм с таким id не найден");
+            throw new ValidationException("{\n" +
+                    "    \"error\": \"Фильм с таким id не найден.\"\n" +
+                    "}");
         }
 
     }
@@ -60,22 +62,30 @@ public class FilmService {
 
         if (film.getName() == null || film.getName().isEmpty()) {
             log.error("Ошибка валидации фильма: название не может быть пустым.");
-            throw new ValidationException("Название фильма не может быть пустым!");
+            throw new ValidationException("{\n" +
+                    "    \"error\": \"Название фильма не может быть пустым!\"\n" +
+                    "}");
         }
 
         if (film.getDescription() != null && film.getDescription().length() > 200) {
             log.error("Ошибка валидации фильма: максимальная длина описания — 200 символов.");
-            throw new ValidationException("Максимальная длина описания фильма - 200 символов!");
+            throw new ValidationException("{\n" +
+                    "    \"error\": \"Максимальная длина описания фильма - 200 символов!\"\n" +
+                    "}");
         }
 
         if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(LocalDate.of(1895, 11, 28))) {
             log.error("Ошибка валидации фильма: дата релиза не может быть раньше 28 декабря 1895 года.");
-            throw new ValidationException("Дата релиза фильма не может быть раньше 28.11.1895!");
+            throw new ValidationException("{\n" +
+                    "    \"error\": \"Дата релиза фильма не может быть раньше 28.11.1895!\"\n" +
+                    "}");
         }
 
-        if (film.getDuration() == null || film.getDuration().isNegative() || film.getDuration().isZero()) {
+        if (film.getDuration() < 0 || film.getDuration() == 0) {
             log.error("Ошибка валидации фильма: продолжительность фильма должна быть положительным числом.");
-            throw new ValidationException("Продолжительность фильма должна быть положительным числом!");
+            throw new ValidationException("{\n" +
+                    "    \"error\": \"Продолжительность фильма должна быть положительным числом!\"\n" +
+                    "}");
         }
 
     }

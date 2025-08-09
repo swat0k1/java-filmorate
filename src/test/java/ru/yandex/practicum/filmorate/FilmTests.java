@@ -31,7 +31,7 @@ public class FilmTests {
         film.setName("TestName");
         film.setDescription("TestDescription");
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
-        film.setDuration(Duration.ofMinutes(120));
+        film.setDuration(120);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertTrue(violations.isEmpty());
@@ -47,7 +47,7 @@ public class FilmTests {
                 "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" +
                 "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
         film.setReleaseDate(LocalDate.of(9999, 1, 1));
-        film.setDuration(Duration.ofMinutes(-10));
+        film.setDuration(-10);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());

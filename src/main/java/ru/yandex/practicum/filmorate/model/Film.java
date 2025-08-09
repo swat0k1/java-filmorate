@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
@@ -19,7 +21,7 @@ public class Film {
     private String description;
     @PastOrPresent(message = "Дата релиза не может быть больше текущей даты.")
     private LocalDate releaseDate;
-    @DurationMin(message = "Продолжительность фильма должна быть положительным числом.", nanos = 1)
-    private Duration duration;
+    @Positive
+    private int duration;
 
 }
