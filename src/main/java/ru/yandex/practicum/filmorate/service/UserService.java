@@ -29,10 +29,10 @@ public class UserService {
 
         validateUser(updatedUser);
 
-        Optional<User> existUser = users.
-                                    stream().
-                                    filter(user -> user.getId() == id).
-                                    findFirst();
+        Optional<User> existUser = users
+                                .stream()
+                                .filter(user -> user.getId() == id)
+                                .findFirst();
 
         if (existUser.isPresent()) {
 

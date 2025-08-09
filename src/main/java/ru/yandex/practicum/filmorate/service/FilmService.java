@@ -29,10 +29,10 @@ public class FilmService {
 
         validateFilm(updatedFilm);
 
-        Optional<Film> existFilm = films.
-                                    stream().
-                                    filter(film -> film.getId() == id).
-                                    findFirst();
+        Optional<Film> existFilm = films
+                                .stream()
+                                .filter(film -> film.getId() == id)
+                                .findFirst();
 
         if (existFilm.isPresent()) {
 
