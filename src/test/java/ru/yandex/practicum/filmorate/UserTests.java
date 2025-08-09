@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
