@@ -13,7 +13,7 @@ public interface UserStorage {
     ArrayList<User> getAllUsers();
 
     User getUserById(int id);
-    
+
     void deleteUser(int id);
 
 }
