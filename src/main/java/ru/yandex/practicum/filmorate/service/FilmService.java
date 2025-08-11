@@ -1,93 +1,96 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.FindingException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class FilmService {
 
-    private final ArrayList<Film> films = new ArrayList<>();
-    private int currentId = 1;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
+
+    @Autowired
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+    }
 
     public Film addFilm(Film film) {
-        validateFilm(film);
-        film.setId(currentId);
-        currentId++;
-        films.add(film);
-        log.info("Фильм добавлен: {}", film);
-        return film;
+        return filmStorage.addFilm(film);
     }
 
     public Film updateFilm(int id, Film updatedFilm) {
-
-        validateFilm(updatedFilm);
-
-        Optional<Film> existFilm = films
-                                .stream()
-                                .filter(film -> film.getId() == id)
-                                .findFirst();
-
-        if (existFilm.isPresent()) {
-
-            Film film = existFilm.get();
-            film.setName(updatedFilm.getName());
-            film.setDescription(updatedFilm.getDescription());
-            film.setReleaseDate(updatedFilm.getReleaseDate());
-            film.setDuration(updatedFilm.getDuration());
-            log.info("Фильм обновлен: {}", film);
-
-            return film;
-
-        } else {
-            log.warn("Фильм с указанным id {} не был найден", id);
-            throw new ValidationException("{\n" +
-                    "    \"error\": \"Фильм с таким id не найден.\"\n" +
-                    "}");
-        }
-
+        return filmStorage.updateFilm(id, updatedFilm);
     }
 
     public ArrayList<Film> getAllFilms() {
-        return films;
+        return filmStorage.getAllFilms();
     }
 
-    private void validateFilm(Film film) {
+    public void addLike(int filmId, int userId) {
+        Film film = filmStorage.getFilmById(filmId);
+        User user = userStorage.getUserById(userId);
 
-        if (film.getName() == null || film.getName().isEmpty()) {
-            log.error("Ошибка валидации фильма: название не может быть пустым.");
-            throw new ValidationException("{\n" +
-                    "    \"error\": \"Название фильма не может быть пустым!\"\n" +
+        if (film == null) {
+            throw new FindingException("{\n" +
+                    "    \"error\": \"Фильм не найден!\"\n" +
                     "}");
         }
 
-        if (film.getDescription() != null && film.getDescription().length() > 200) {
-            log.error("Ошибка валидации фильма: максимальная длина описания — 200 символов.");
-            throw new ValidationException("{\n" +
-                    "    \"error\": \"Максимальная длина описания фильма - 200 символов!\"\n" +
+        if (user == null) {
+            throw new FindingException("{\n" +
+                    "    \"error\": \"Пользователь не найден!\"\n" +
                     "}");
         }
 
-        if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(LocalDate.of(1895, 11, 28))) {
-            log.error("Ошибка валидации фильма: дата релиза не может быть раньше 28 декабря 1895 года.");
+        if (film.getLikes().add(userId)) {
+            log.info("Пользователь {} поставил лайк фильму {}", userId, filmId);
+        } else {
             throw new ValidationException("{\n" +
-                    "    \"error\": \"Дата релиза фильма не может быть раньше 28.11.1895!\"\n" +
+                    "    \"error\": \"Пользователь уже поставил лайк этому фильму.\"\n" +
+                    "}");
+        }
+    }
+
+    public void removeLike(int filmId, int userId) {
+        Film film = filmStorage.getFilmById(filmId);
+
+        if (film == null) {
+            throw new FindingException("{\n" +
+                    "    \"error\": \"Фильм не найден!\"\n" +
                     "}");
         }
 
-        if (film.getDuration() < 0 || film.getDuration() == 0) {
-            log.error("Ошибка валидации фильма: продолжительность фильма должна быть положительным числом.");
-            throw new ValidationException("{\n" +
-                    "    \"error\": \"Продолжительность фильма должна быть положительным числом!\"\n" +
+        if (film.getLikes().remove(userId)) {
+            log.info("Пользователь {} убрал лайк с фильма {}", userId, filmId);
+        } else {
+            throw new FindingException("{\n" +
+                    "    \"error\": \"Пользователь не ставил лайк этому фильму.\"\n" +
                     "}");
         }
+    }
 
+    public Film getFilmById(int filmId) {
+        return filmStorage.getFilmById(filmId);
+    }
+
+    public List<Film> getTopFilms(int count) {
+        return filmStorage.getAllFilms().stream()
+                .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
 }

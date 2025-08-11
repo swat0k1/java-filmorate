@@ -1,89 +1,89 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Optional;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class UserService {
 
-    private final ArrayList<User> users = new ArrayList<>();
-    private int currentId = 1;
+    private final UserStorage userStorage;
+
+    @Autowired
+    public UserService(UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     public User createUser(User user) {
-        validateUser(user);
-        if ((user.getName() == null || user.getName().isEmpty()) && !user.getLogin().isEmpty()) {
-            user.setName(user.getLogin());
-        }
-        user.setId(currentId);
-        currentId++;
-        users.add(user);
-        log.info("Пользователь создан: {}", user);
-        return user;
+        return userStorage.createUser(user);
     }
 
     public User updateUser(int id, User updatedUser) {
-
-        validateUser(updatedUser);
-
-        Optional<User> existUser = users
-                                .stream()
-                                .filter(user -> user.getId() == id)
-                                .findFirst();
-
-        if (existUser.isPresent()) {
-
-            User user = existUser.get();
-            user.setEmail(updatedUser.getEmail());
-            user.setLogin(updatedUser.getLogin());
-            user.setName(updatedUser.getName());
-            user.setBirthday(updatedUser.getBirthday());
-            log.info("Пользователь обновлен: {}", user);
-
-            return user;
-
-        } else {
-            log.warn("Пользователь с указанным id {} не был найден", id);
-            throw new ValidationException("{\n" +
-                    "    \"error\": \"Пользователь с таким id не найден.\"\n" +
-                    "}");
-        }
-
+        return userStorage.updateUser(id, updatedUser);
     }
 
     public ArrayList<User> getAllUsers() {
-        return users;
+        return userStorage.getAllUsers();
     }
 
-    private void validateUser(User user) {
+    public void addFriend(int userId, int friendId) {
+        User user = userStorage.getUserById(userId);
+        User friend = userStorage.getUserById(friendId);
 
-        if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
-            log.error("Ошибка валидации пользователя: электронная почта не может быть пустой и должна содержать символ '@'.");
+        if (user == null || friend == null) {
             throw new ValidationException("{\n" +
-                    "    \"error\": \"Электронная почта не может быть пустой и должна содержать символ '@'!\"\n" +
+                    "    \"error\": \"Пользователь не найден!\"\n" +
                     "}");
         }
 
-        if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
-            log.error("Ошибка валидации пользователя: логин не может быть пустым и содержать пробелы.");
+        user.getFriends().add(friendId);
+        friend.getFriends().add(userId);
+
+        log.info("Пользователь {} добавил в друзья {}", userId, friendId);
+    }
+
+    public void removeFriend(int userId, int friendId) {
+        User user = userStorage.getUserById(userId);
+        User friend = userStorage.getUserById(friendId);
+
+        if (user == null || friend == null) {
             throw new ValidationException("{\n" +
-                    "    \"error\": \"Логин не может быть пустым и содержать пробелы!\"\n" +
+                    "    \"error\": \"Пользователь не найден!\"\n" +
                     "}");
         }
 
-        if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
-            log.error("Ошибка валидации пользователя: дата рождения не может быть больше текущей даты или пустой.");
+        user.getFriends().remove(friendId);
+        friend.getFriends().remove(userId);
+
+        log.info("Пользователь {} удалил из друзей {}", userId, friendId);
+    }
+
+    public List<User> getCommonFriends(int userId, int friendId) {
+        User user = userStorage.getUserById(userId);
+        User friend = userStorage.getUserById(friendId);
+
+        if (user == null || friend == null) {
             throw new ValidationException("{\n" +
-                    "    \"error\": \"Дата рождения не может быть больше текущей даты или пустой!\"\n" +
+                    "    \"error\": \"Пользователь не найден!\"\n" +
                     "}");
         }
 
+        Set<Integer> commonFriends = user.getFriends().stream()
+                .filter(friend.getFriends()::contains)
+                .collect(Collectors.toSet());
+
+        return commonFriends.stream()
+                .map(userStorage::getUserById)
+                .collect(Collectors.toList());
     }
 
 }
