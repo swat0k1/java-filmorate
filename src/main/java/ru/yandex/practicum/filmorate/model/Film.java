@@ -22,7 +22,9 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private int duration;
+    private FilmRating rating;
 
     private Set<Integer> likes = new HashSet<>();
+    private Set<FilmGenre> genres = new HashSet<>();
 
 }

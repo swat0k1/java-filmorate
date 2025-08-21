@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.FriendshipStatus;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -45,10 +46,32 @@ public class UserService {
                     "}");
         }
 
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
+        user.getFriends().put(friendId, FriendshipStatus.PENDING);
+        friend.getFriends().put(userId, FriendshipStatus.PENDING);
 
         log.info("Пользователь {} добавил в друзья {}", userId, friendId);
+    }
+
+    public void confirmFriendship(int userId, int friendId) {
+        User user = userStorage.getUserById(userId);
+        User friend = userStorage.getUserById(friendId);
+
+        if (user == null || friend == null) {
+            throw new ValidationException("{\n" +
+                    "    \"error\": \"Пользователь не найден!\"\n" +
+                    "}");
+        }
+
+        if (user.getFriends().containsKey(friendId) &&
+                user.getFriends().get(friendId) == FriendshipStatus.PENDING) {
+            user.getFriends().put(friendId, FriendshipStatus.CONFIRMED);
+            friend.getFriends().put(userId, FriendshipStatus.CONFIRMED); // Делаем это двусторонним
+            log.info("Пользователь {} подтвердил дружбу с {}", userId, friendId);
+        } else {
+            throw new ValidationException("{\n" +
+                    "    \"error\": \"Дружба не может быть подтверждена!\"\n" +
+                    "}");
+        }
     }
 
     public void removeFriend(int userId, int friendId) {
@@ -77,8 +100,8 @@ public class UserService {
                     "}");
         }
 
-        Set<Integer> commonFriends = user.getFriends().stream()
-                .filter(friend.getFriends()::contains)
+        Set<Integer> commonFriends = user.getFriends().keySet().stream()
+                .filter(friend.getFriends()::containsKey)
                 .collect(Collectors.toSet());
 
         return commonFriends.stream()

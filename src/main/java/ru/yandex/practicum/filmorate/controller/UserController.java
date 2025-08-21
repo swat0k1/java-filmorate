@@ -62,6 +62,12 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{id}/friends/confirm/{friendId}")
+    public ResponseEntity<Void> confirmFriendship(@PathVariable int id, @PathVariable int friendId) {
+        userService.confirmFriendship(id, friendId);
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{id}/friends/{friendId}")
     public ResponseEntity<Void> removeFriend(@PathVariable int id, @PathVariable int friendId) {
         userService.removeFriend(id, friendId);
@@ -78,12 +84,12 @@ public class UserController {
                         "}"));
 
         // Извлекаем объекты User для друзей
-        List<User> friends = user.getFriends().stream()
+        List<User> friends = user.getFriends().keySet().stream()
                 .map(friendId -> userService.getAllUsers().stream()
                         .filter(f -> f.getId() == friendId)
                         .findFirst()
-                        .orElse(null)) // При необходимости обработать отсутствие друга
-                .filter(friend -> friend != null) // Удаляем возможные null
+                        .orElse(null))
+                .filter(friend -> friend != null)
                 .collect(Collectors.toList());
 
         return new ResponseEntity<>(friends, HttpStatus.OK);
