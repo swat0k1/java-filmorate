@@ -26,6 +26,7 @@ public class UserTests {
     @Test
     public void testCorrectUser() {
         User user = new User();
+        user.setId(1);
         user.setEmail("test@test.ru");
         user.setLogin("test");
         user.setBirthday(LocalDate.of(2000, 1, 1));
@@ -37,6 +38,7 @@ public class UserTests {
     @Test
     public void testInvalidUser() {
         User user = new User();
+        user.setId(2);
         user.setEmail("какой то меил");
         user.setLogin("логин такой");
         user.setBirthday(LocalDate.of(9999, 1, 1));

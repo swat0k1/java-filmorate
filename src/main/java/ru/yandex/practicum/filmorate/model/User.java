@@ -1,13 +1,19 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class User {
 
     private int id;
@@ -21,6 +27,13 @@ public class User {
     @Past(message = "Дата рождения не может быть больше текущей даты.")
     private LocalDate birthday;
 
-    private Map<Integer, FriendshipStatus> friends = new HashMap<>();
+    private Set<Integer> friends = new HashSet<>();
 
+    public User(int id, String email, String login, String name, LocalDate birthday) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+    }
 }
