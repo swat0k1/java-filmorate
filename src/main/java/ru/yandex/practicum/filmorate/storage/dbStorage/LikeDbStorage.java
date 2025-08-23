@@ -14,23 +14,23 @@ import java.util.Map;
 @Repository
 public class LikeDbStorage extends BaseRepository<Film> {
 
-    private static final String INSERT = "INSERT " +
+    private static final String insert = "INSERT " +
                                         "INTO film_likes (film_id, user_liked_id) " +
                                         "VALUES (?, ?)";
 
-    private static final String FIND_FILM_LIKES = "SELECT user_liked_id " +
+    private static final String findFilmsLike = "SELECT user_liked_id " +
                                                     "FROM film_likes " +
                                                     "WHERE film_id = ?";
 
-    private static final String DELETE = "DELETE " +
+    private static final String delete = "DELETE " +
                                             "FROM film_likes " +
                                             "WHERE film_id = ? AND user_liked_id = ?";
 
-    private static final String DELETE_ALL_FILM_LIKES = "DELETE " +
+    private static final String deleteAllFilmLikes = "DELETE " +
                                                         "FROM film_likes " +
                                                         "WHERE film_id = ?";
 
-    private static final String FIND_ALL_FILMS_LIKES = "SELECT * " +
+    private static final String findAllFilmsLikes = "SELECT * " +
                                                         "FROM film_likes";
 
     public LikeDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
@@ -38,24 +38,24 @@ public class LikeDbStorage extends BaseRepository<Film> {
     }
 
     public void addLike(int filmId, int userId) {
-        update(INSERT, filmId, userId);
+        update(insert, filmId, userId);
     }
 
     public Collection<Integer> getFilmLikes(int filmId) {
-        return jdbc.queryForList(FIND_FILM_LIKES, Integer.TYPE, filmId);
+        return jdbc.queryForList(findFilmsLike, Integer.TYPE, filmId);
     }
 
     public void deleteLike(int filmId, int userId) {
-        update(DELETE, filmId, userId);
+        update(delete, filmId, userId);
     }
 
     public void deleteAllFilmLikes(int filmId) {
-        update(DELETE_ALL_FILM_LIKES, filmId);
+        update(deleteAllFilmLikes, filmId);
     }
 
     public Map<Integer, Collection<Integer>> findAllFilmsLikes() {
         Map<Integer, Collection<Integer>> likes = new HashMap<>();
-        return jdbc.query(FIND_ALL_FILMS_LIKES, (ResultSet resultSet) -> {
+        return jdbc.query(findAllFilmsLikes, (ResultSet resultSet) -> {
             while (resultSet.next()) {
                 int filmId = resultSet.getInt("film_id");
                 int likeId = resultSet.getInt("user_liked_id");

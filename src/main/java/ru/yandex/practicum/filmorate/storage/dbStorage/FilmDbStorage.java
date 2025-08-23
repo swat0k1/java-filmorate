@@ -19,28 +19,28 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
     private GenreDbStorage genreDbStorage;
     private LikeDbStorage likeDbStorage;
 
-    private static final String INSERT = "INSERT " +
+    private static final String insert = "INSERT " +
                                         "INTO films (name, description, release_date, duration, rating_id) " +
                                         "VALUES (?, ?, ?, ?, ?)";
 
-    private static final String UPDATE = "UPDATE films " +
+    private static final String update = "UPDATE films " +
                                         "SET name = ?, description = ?, " +
                                         "release_date = ?, duration = ?, rating_id = ? " +
                                         "WHERE id = ?";
 
-    private static final String FIND_ALL = "SELECT * " +
+    private static final String findAll = "SELECT * " +
                                             "FROM films f, rating_mpa m " +
                                             "WHERE f.rating_id = m.mpa_id";
 
-    private static final String FIND_BY_ID = "SELECT * " +
+    private static final String findById = "SELECT * " +
                                             "FROM films f, rating_mpa m " +
                                             "WHERE f.rating_id = m.mpa_id AND f.id = ?";
 
-    private static final String DELETE = "DELETE " +
+    private static final String delete = "DELETE " +
                                         "FROM films " +
                                         "WHERE id = ?";
 
-    private static final String FIND_POPULAR_FILMS = "SELECT * " +
+    private static final String findTopFilms = "SELECT * " +
                                                     "FROM films f " +
                                                     "LEFT JOIN rating_mpa m " +
                                                     "ON f.id = m.mpa_id " +
@@ -64,7 +64,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
                 .orElseThrow(() -> new FindingException("Рейтинг не найден!."));
         Collection<Genre> genres = genreDbStorage.findManyByList(film.getGenres());
         int id = insert(
-                INSERT,
+                insert,
                 film.getName(),
                 film.getDescription(),
                 Timestamp.valueOf(film.getReleaseDate().atStartOfDay()),
@@ -82,7 +82,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
     public Film updateFilm(Film film) {
         mpaDbStorage.findById(film.getMpa().getId());
         update(
-                UPDATE,
+                update,
                 film.getName(),
                 film.getDescription(),
                 Timestamp.valueOf(film.getReleaseDate().atStartOfDay()),
@@ -95,7 +95,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
 
     @Override
     public Collection<Film> getAllFilms() {
-        Collection<Film> films = findMany(FIND_ALL);
+        Collection<Film> films = findMany(findAll);
         Map<Integer, Set<Genre>> genres = genreDbStorage.findAllFilmsGenres();
         Map<Integer, Collection<Integer>> likes = likeDbStorage.findAllFilmsLikes();
         for (Film film : films) {
@@ -107,7 +107,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
 
     @Override
     public Film getFilmById(int id) {
-        Film film = findOne(FIND_BY_ID, id)
+        Film film = findOne(findById, id)
                 .orElseThrow(() -> new FindingException("Фильм с id = " + id + " не найден"));
         film.setGenres(new HashSet<>(genreDbStorage.findByFilmId(id)));
         film.setLikes(likeDbStorage.getFilmLikes(id));
@@ -119,13 +119,13 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
         Film film = getFilmById(id);
         genreDbStorage.deleteGenres(id);
         if (!film.getLikes().isEmpty()) likeDbStorage.deleteAllFilmLikes(id);
-        update(DELETE, id);
+        update(delete, id);
         return film;
     }
 
     @Override
     public Collection<Film> getTopFilms(int count) {
-        Collection<Film> films = findMany(FIND_POPULAR_FILMS, count);
+        Collection<Film> films = findMany(findTopFilms, count);
         Map<Integer, Set<Genre>> genres = genreDbStorage.findAllFilmsGenres();
         Map<Integer, Collection<Integer>> likes = likeDbStorage.findAllFilmsLikes();
         for (Film film : films) {

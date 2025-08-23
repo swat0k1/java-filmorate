@@ -15,31 +15,31 @@ import java.util.*;
 @Repository
 public class GenreDbStorage extends BaseRepository<Genre> {
 
-    private static final String INSERT = "INSERT " +
+    private static final String insert = "INSERT " +
                                         "INTO film_genres (film_id, genre_id) " +
                                         "VALUES (?, ?)";
 
-    private static final String FIND_BY_ID = "SELECT * " +
+    private static final String findById = "SELECT * " +
                                             "FROM genres " +
                                             "WHERE id = ?";
 
-    private static final String FIND_MANY = "SELECT * " +
+    private static final String findMany = "SELECT * " +
                                             "FROM genres " +
                                             "WHERE id IN (%s)";
 
-    private static final String FIND_ALL = "SELECT * " +
+    private static final String findAll = "SELECT * " +
                                             "FROM genres";
 
-    private static final String FIND_BY_FILM_ID = "SELECT id, name " +
+    private static final String findByFilmId = "SELECT id, name " +
                                                     "FROM genres g, film_genres fg " +
                                                     "WHERE g.id = fg.genre_id AND fg.film_id = ?";
 
-    private static final String FIND_ALL_FILMS_GENRES = "SELECT film_id, genre_id, name " +
+    private static final String findAllFilmsGenres = "SELECT film_id, genre_id, name " +
                                                         "FROM film_genres fg, " +
                                                         "genres g " +
                                                         "WHERE fg.genre_id = g.id";
 
-    private static final String DELETE_ALL_GENRES_FILM = "DELETE " +
+    private static final String deleteAllGenresFilm = "DELETE " +
                                                         "FROM film_genres " +
                                                         "WHERE film_id = ?";
 
@@ -50,7 +50,7 @@ public class GenreDbStorage extends BaseRepository<Genre> {
     public void setFilmGenres(int filmId, Collection<Genre> genres) {
         if (genres.isEmpty()) return;
         List<Integer> genresId = new ArrayList<>(genres.stream().map(Genre::getId).toList());
-        batchUpdateBase(INSERT, new BatchPreparedStatementSetter() {
+        batchUpdateBase(insert, new BatchPreparedStatementSetter() {
 
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -66,7 +66,7 @@ public class GenreDbStorage extends BaseRepository<Genre> {
     }
 
     public Optional<Genre> findById(int genreId) {
-        return findOne(FIND_BY_ID, genreId);
+        return findOne(findById, genreId);
     }
 
     public Collection<Genre> findManyByList(Collection<Genre> genres) {
@@ -75,7 +75,7 @@ public class GenreDbStorage extends BaseRepository<Genre> {
         String inSql = String.join(",", Collections.nCopies(genresId.size(), "?"));
 
         List<Genre> result = jdbc.query(
-                String.format(FIND_MANY, inSql),
+                String.format(findMany, inSql),
                 genresId.toArray(),
                 rowMapper);
         if (result.size() != genresId.size()) throw new FindingException("Жанр не найден!");
@@ -83,16 +83,16 @@ public class GenreDbStorage extends BaseRepository<Genre> {
     }
 
     public Collection<Genre> findAll() {
-        return findMany(FIND_ALL);
+        return findMany(findAll);
     }
 
     public Collection<Genre> findByFilmId(long filmId) {
-        return findMany(FIND_BY_FILM_ID, filmId);
+        return findMany(findByFilmId, filmId);
     }
 
     public Map<Integer, Set<Genre>> findAllFilmsGenres() {
         Map<Integer, Set<Genre>> genres = new HashMap<>();
-        return jdbc.query(FIND_ALL_FILMS_GENRES, (ResultSet resultSet) -> {
+        return jdbc.query(findAllFilmsGenres, (ResultSet resultSet) -> {
             while (resultSet.next()) {
                 Integer filmId = resultSet.getInt("film_id");
                 Integer genreId = resultSet.getInt("genre_id");
@@ -104,6 +104,6 @@ public class GenreDbStorage extends BaseRepository<Genre> {
     }
 
     public void deleteGenres(int filmId) {
-        update(DELETE_ALL_GENRES_FILM, filmId);
+        update(deleteAllGenresFilm, filmId);
     }
 }

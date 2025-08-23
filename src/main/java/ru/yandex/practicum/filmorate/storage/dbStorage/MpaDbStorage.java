@@ -11,10 +11,10 @@ import java.util.Optional;
 @Repository
 public class MpaDbStorage extends BaseRepository<Mpa> {
 
-    private static final String FIND_BY_ID = "SELECT * " +
+    private static final String findById = "SELECT * " +
                                                 "FROM rating_MPA " +
                                                 "WHERE mpa_id = ?";
-    private static final String FIND_ALL = "SELECT * " +
+    private static final String findAll = "SELECT * " +
                                             "FROM rating_MPA";
 
     public MpaDbStorage(JdbcTemplate jdbc, RowMapper<Mpa> mapper) {
@@ -22,10 +22,10 @@ public class MpaDbStorage extends BaseRepository<Mpa> {
     }
 
     public Optional<Mpa> findById(int mpaId) {
-        return findOne(FIND_BY_ID, mpaId);
+        return findOne(findById, mpaId);
     }
 
     public List<Mpa> findAll() {
-        return findMany(FIND_ALL);
+        return findMany(findAll);
     }
 }

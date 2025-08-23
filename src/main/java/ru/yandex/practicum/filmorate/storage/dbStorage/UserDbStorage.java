@@ -17,31 +17,31 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
 
     FriendDbStorage friendDbStorage;
 
-    private static final String INSERT = "INSERT " +
+    private static final String insert = "INSERT " +
                                             "INTO users (email, login, name, birthday) " +
                                             "VALUES (?, ?, ?, ?)";
 
-    private static final String UPDATE = "UPDATE users " +
+    private static final String update = "UPDATE users " +
                                             "SET email = ?, login = ?, " +
                                             "name = ?, birthday = ? " +
                                             "WHERE id = ?";
 
-    private static final String FIND_ALL = "SELECT * " +
+    private static final String findAll = "SELECT * " +
                                             "FROM users";
 
-    private static final String FIND_BY_ID = "SELECT * " +
+    private static final String findById = "SELECT * " +
                                                 "FROM users " +
                                                 "WHERE id = ?";
 
-    private static final String DELETE = "DELETE " +
+    private static final String delete = "DELETE " +
                                             "FROM users " +
                                             "WHERE id = ?";
 
-    private static final String FIND_MANY = "SELECT * " +
+    private static final String findMany = "SELECT * " +
                                                 "FROM users " +
                                                 "WHERE id IN (%s)";
 
-    private static final String FIND_COMMON_FRIENDS = "SELECT id " +
+    private static final String findCommonFriends = "SELECT id " +
                                                         "FROM users " +
                                                         "WHERE id IN " +
                                                             "(SELECT friend_id " +
@@ -59,7 +59,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
     @Override
     public User createUser(User user) {
         int id = insert(
-                INSERT,
+                insert,
                 user.getEmail(),
                 user.getLogin(),
                 user.getName(),
@@ -73,7 +73,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
     public User updateUser(User user) {
         try {
             update(
-                    UPDATE,
+                    update,
                     user.getEmail(),
                     user.getLogin(),
                     user.getName(),
@@ -88,7 +88,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
 
     @Override
     public Collection<User> getAllUsers() {
-        Collection<User> users = findMany(FIND_ALL);
+        Collection<User> users = findMany(findAll);
         Map<Integer, Set<Integer>> friends = friendDbStorage.getAllFriendsId();
         for (User user : users) {
             user.setFriends(friends.getOrDefault(user.getId(), new HashSet<>()));
@@ -98,7 +98,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
 
     @Override
     public User getUserById(int id) {
-        User user = findOne(FIND_BY_ID, id)
+        User user = findOne(findById, id)
                 .orElseThrow(() -> new FindingException("Пользователь с id = " + id + " не найден"));
         user.setFriends(friendDbStorage.getFriendsId(user.getId()));
         return user;
@@ -108,7 +108,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
     public User deleteUser(int id) {
         User user = getUserById(id);
         if (!user.getFriends().isEmpty()) friendDbStorage.deleteAllUserFriends(id);
-        update(DELETE, id);
+        update(delete, id);
         return user;
     }
 
@@ -123,7 +123,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
         String inSql = String.join(",", Collections.nCopies(usersId.size(), "?"));
 
         List<User> result = jdbc.query(
-                String.format(FIND_MANY, inSql),
+                String.format(findMany, inSql),
                 usersId.toArray(),
                 rowMapper);
         if (result.size() != usersId.size()) throw new ValidationException("Указан User с неверным id!");
@@ -131,7 +131,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
     }
 
     public Collection<User> getCommonFriends(int firstUserId, int secondUserId) {
-        Collection<Integer> friends = jdbc.queryForList(FIND_COMMON_FRIENDS, Integer.TYPE, firstUserId, secondUserId);
+        Collection<Integer> friends = jdbc.queryForList(findCommonFriends, Integer.TYPE, firstUserId, secondUserId);
         return findMany(friends);
     }
 }
