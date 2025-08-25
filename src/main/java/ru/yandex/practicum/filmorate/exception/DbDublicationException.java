@@ -5,10 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Slf4j
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public class ValidationException extends RuntimeException {
+@ResponseStatus(HttpStatus.CONFLICT)
+public class DbDublicationException extends RuntimeException {
 
-    public ValidationException(String message) {
+    public DbDublicationException(String message) {
         super(message);
         log.warn(message);
     }

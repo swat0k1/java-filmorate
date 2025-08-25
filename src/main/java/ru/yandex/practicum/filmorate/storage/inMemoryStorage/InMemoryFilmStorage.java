@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.storage.inMemoryStorage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -12,12 +12,12 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-public class InMemoryFilmStorage implements FilmStorage {
+@Deprecated
+public class InMemoryFilmStorage /*implements FilmStorage*/ {
 
     private final ArrayList<Film> films = new ArrayList<>();
     private int currentId = 1;
 
-    @Override
     public Film addFilm(Film film) {
         validateFilm(film);
         film.setId(currentId);
@@ -27,7 +27,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         return film;
     }
 
-    @Override
     public Film updateFilm(int id, Film updatedFilm) {
         validateFilm(updatedFilm);
         Optional<Film> existFilm = films.stream().filter(film -> film.getId() == id).findFirst();
@@ -48,17 +47,14 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
     }
 
-    @Override
     public ArrayList<Film> getAllFilms() {
         return films;
     }
 
-    @Override
     public Film getFilmById(int id) {
         return films.stream().filter(film -> film.getId() == id).findFirst().orElse(null);
     }
 
-    @Override
     public void deleteFilm(int id) {
         films.removeIf(film -> film.getId() == id);
     }

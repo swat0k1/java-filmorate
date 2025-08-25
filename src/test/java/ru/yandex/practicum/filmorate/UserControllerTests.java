@@ -27,8 +27,10 @@ public class UserControllerTests {
     @Test
     public void testCreateUser_ValidInput() throws Exception {
         User user = new User();
+        user.setId(3);
         user.setEmail("test@test.ru");
         user.setLogin("test");
+        user.setName("test");
         user.setBirthday(LocalDate.of(2000, 1, 1));
 
         mockMvc.perform(post("/users")
@@ -40,8 +42,10 @@ public class UserControllerTests {
     @Test
     public void testCreateUser_InvalidEmail() throws Exception {
         User user = new User();
+        user.setId(4);
         user.setEmail("какой то меил");
         user.setLogin("логин такой");
+        user.setName("test");
         user.setBirthday(LocalDate.of(2000, 1, 1));
 
         mockMvc.perform(post("/users")

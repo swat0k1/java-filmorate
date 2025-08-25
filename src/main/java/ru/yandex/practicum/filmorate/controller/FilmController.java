@@ -1,26 +1,24 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.FindingException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/films")
 @Validated
+@Slf4j
+@AllArgsConstructor
 public class FilmController {
 
     @Autowired
@@ -34,64 +32,47 @@ public class FilmController {
 
     @PutMapping
     public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
-        Film updatedFilm = filmService.updateFilm(film.getId(), film);
+        Film updatedFilm = filmService.updateFilm(film);
         return new ResponseEntity<>(updatedFilm, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Film> getFilmById(@PathVariable int id) {
+    public ResponseEntity<Film> getFilmById(@PathVariable("id") int id) {
         Film film = filmService.getFilmById(id);
         if (film == null) {
-            throw new ValidationException("{\n" +
-                    "    \"error\": \"Фильм не найден!\"\n" +
-                    "}");
+            throw new ValidationException("Фильм не найден!");
         }
         return new ResponseEntity<>(film, HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<ArrayList<Film>> getAllFilms() {
-        ArrayList<Film> films = filmService.getAllFilms();
+    public ResponseEntity<Collection<Film>> getAllFilms() {
+        Collection<Film> films = filmService.getAllFilms();
         return new ResponseEntity<>(films, HttpStatus.OK);
     }
 
     @PutMapping("/{filmId}/like/{userId}")
-    public ResponseEntity<Void> addLike(@PathVariable int filmId, @PathVariable int userId) {
+    public ResponseEntity<Film> addLike(@PathVariable("filmId") int filmId, @PathVariable("userId") int userId) {
         filmService.addLike(filmId, userId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
-    public ResponseEntity<Void> removeLike(@PathVariable int filmId, @PathVariable int userId) {
+    public ResponseEntity<Film> removeLike(@PathVariable("filmId") int filmId, @PathVariable("userId") int userId) {
         filmService.removeLike(filmId, userId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<List<Film>> getTopFilms(@RequestParam(defaultValue = "10") int count) {
-        List<Film> topFilms = filmService.getTopFilms(count);
+    public ResponseEntity<Collection<Film>> getTopFilms(@RequestParam(name = "count",
+                                                        defaultValue = "10", required = false) int count) {
+        Collection<Film> topFilms = filmService.getTopFilms(count);
         return new ResponseEntity<>(topFilms, HttpStatus.OK);
     }
 
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<String> handleValidationException(ValidationException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(FindingException.class)
-    public ResponseEntity<String> handleFindingException(FindingException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException e) {
-        Map<String, String> errors = new HashMap<>();
-        e.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    @DeleteMapping("/{id}")
+    public Film delete(@PathVariable("id") int id) {
+        return filmService.delete(id);
     }
 
 }

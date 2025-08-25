@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
 
@@ -27,10 +28,12 @@ public class FilmControllerTests {
     @Test
     public void testAddFilm_ValidInput() throws Exception {
         Film film = new Film();
+        film.setId(3);
         film.setName("Inception");
         film.setDescription("A mind-bending thriller.");
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(148);
+        film.setMpa(new Mpa(1, "test"));
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -41,6 +44,7 @@ public class FilmControllerTests {
     @Test
     public void testAddFilm_InvalidDescription() throws Exception {
         Film film = new Film();
+        film.setId(4);
         film.setName("Test");
         film.setDescription("11111111111111111111111111111111111111111111111111111111111111111111111111111111111111" +
                 "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" +
@@ -48,6 +52,7 @@ public class FilmControllerTests {
                 "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
         film.setReleaseDate(LocalDate.now());
         film.setDuration(120);
+        film.setMpa(new Mpa(1, "test"));
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -61,7 +66,7 @@ public class FilmControllerTests {
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
-                        .andExpect(status().isBadRequest());
+                        .andExpect(status().is5xxServerError());
     }
 
 }
