@@ -52,16 +52,34 @@ public class FilmDbStorageTest {
 
     @BeforeEach
     void beforeALL() {
-        film1 = new Film(1, "TestName", "TestDescription", LocalDate.of(2000, 1,
-                                1), 120, new Mpa(1, null));
+
+        film1 = new Film();
+        film1.setId(1);
+        film1.setName("TestName");
+        film1.setDescription("TestDescription");
+        film1.setReleaseDate(LocalDate.of(2000, 1, 1));
+        film1.setDuration(120);
+        film1.setMpa(new Mpa(1, null));
+
         Set<Genre> genres = new HashSet<>();
         genres.add(new Genre(1, "test"));
         film1.setGenres(genres);
 
-        film2 = new Film(2, "TestName2", "TestDescription2", LocalDate.of(2001, 1,
-                                1), 121, new Mpa(2, null));
-        user1 = new User(1, "test@test.ru", "test", "test",
-                                LocalDate.of(2000, 1, 1));
+        film2 = new Film();
+        film2.setId(2);
+        film2.setName("TestName2");
+        film2.setDescription("TestDescription2");
+        film2.setReleaseDate(LocalDate.of(2001, 1, 1));
+        film2.setDuration(121);
+        film2.setMpa(new Mpa(2, null));
+
+        user1 = new User();
+        user1.setId(1);
+        user1.setEmail("test@test.ru");
+        user1.setName("test");
+        user1.setLogin("test");
+        user1.setBirthday(LocalDate.of(2000, 1, 1));
+
     }
 
     @Test

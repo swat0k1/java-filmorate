@@ -40,7 +40,15 @@ public class UserDbStorageTest {
     }
 
     private User createUser(int id, String email, String login, String name, LocalDate birthday) {
-        return new User(id, email, login, name, birthday);
+
+        User user = new User();
+        user.setId(id);
+        user.setEmail(email);
+        user.setLogin(login);
+        user.setName(name);
+        user.setBirthday(birthday);
+
+        return user;
     }
 
     @Test
