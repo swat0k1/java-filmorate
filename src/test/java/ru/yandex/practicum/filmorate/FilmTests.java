@@ -27,6 +27,7 @@ public class FilmTests {
     public void testCorrectFilm() {
 
         Film film = new Film();
+        film.setId(1);
         film.setName("TestName");
         film.setDescription("TestDescription");
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
@@ -40,6 +41,7 @@ public class FilmTests {
     @Test
     public void testInvalidFilm() {
         Film film = new Film();
+        film.setId(2);
         film.setName("");
         film.setDescription("11111111111111111111111111111111111111111111111111111111111111111111111111111111111111" +
                 "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111" +

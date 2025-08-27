@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.user;
+package ru.yandex.practicum.filmorate.storage.inMemoryStorage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,12 +11,12 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-public class InMemoryUserStorage implements UserStorage {
+@Deprecated
+public class InMemoryUserStorage /*implements UserStorage*/ {
 
     private final ArrayList<User> users = new ArrayList<>();
     private int currentId = 1;
 
-    @Override
     public User createUser(User user) {
         validateUser(user);
         if ((user.getName() == null || user.getName().isEmpty()) && !user.getLogin().isEmpty()) {
@@ -29,7 +29,6 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-    @Override
     public User updateUser(int id, User updatedUser) {
         validateUser(updatedUser);
         Optional<User> existUser = users.stream().filter(user -> user.getId() == id).findFirst();
@@ -50,17 +49,14 @@ public class InMemoryUserStorage implements UserStorage {
         }
     }
 
-    @Override
     public ArrayList<User> getAllUsers() {
         return users;
     }
 
-    @Override
     public User getUserById(int id) {
         return users.stream().filter(user -> user.getId() == id).findFirst().orElse(null);
     }
 
-    @Override
     public void deleteUser(int id) {
         users.removeIf(user -> user.getId() == id);
     }
