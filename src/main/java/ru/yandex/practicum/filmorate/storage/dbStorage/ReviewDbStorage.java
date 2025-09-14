@@ -16,26 +16,26 @@ import java.util.List;
 public class ReviewDbStorage extends BaseRepository<Review> implements ReviewStorage {
 
     private static final String INSERT_REVIEW = "INSERT " +
-            "INTO reviews (content, is_positive, user_id, film_id, useful)" +
+            "INTO reviews (content, is_positive, user_id, film_id, useful) " +
             "VALUES (?, ?, ?, ?, ?)";
 
     private static final String GET_BY_ID = "SELECT * " +
-            "FROM reviews" +
+            "FROM reviews " +
             "WHERE review_id = ?";
 
     private static final String GET_BY_FILM_ID = "SELECT * " +
-            "FROM reviews" +
+            "FROM reviews " +
             "WHERE film_id";
 
     private static final String GET_ALL = "SELECT * " +
             "FROM reviews";
 
     private static final String UPDATE_REVIEW = "UPDATE reviews " +
-            "SET content = ?, is_positive = ?, useful = ?" +
+            "SET content = ?, is_positive = ?, useful = ? " +
             "WHERE review_id = ?";
 
     private static final String DELETE_BY_ID = "DELETE " +
-            "FROM reviews" +
+            "FROM reviews " +
             "WHERE review_id = ?";
 
     private static final String ADD_LIKE = "INSERT " +
@@ -47,11 +47,11 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
             "VALUES (?, ?, false)";
 
     private static final String COUNT_LIKES = "SELECT COUNT(*) " +
-            "FROM review_likes" +
+            "FROM review_likes " +
             "WHERE review_id = ? AND is_like = true";
 
     private static final String COUNT_DISLIKES = "SELECT COUNT(*) " +
-            "FROM review_likes" +
+            "FROM review_likes " +
             "WHERE review_id = ? AND is_like = false";
 
     private static final String HAS_LIKE = "SELECT EXISTS(" +
