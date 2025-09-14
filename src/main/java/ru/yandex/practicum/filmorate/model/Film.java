@@ -36,15 +36,4 @@ public class Film {
     private Collection<Integer> likes = new HashSet<>();
     private Set<Genre> genres = new HashSet<>();
 
-    /*
-    public Film(int id, String name, String description, LocalDate releaseDate, int duration, Mpa mpa) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.mpa = mpa;
-    }
-     */
-
 }
