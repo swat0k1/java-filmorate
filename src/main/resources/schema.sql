@@ -58,4 +58,14 @@ CREATE TABLE IF NOT EXISTS reviews (
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     film_id BIGINT NOT NULL REFERENCES films(id) ON DELETE CASCADE,
     useful INT NOT NULL DEFAULT 0
-)
+);
+
+-- Функциональность Лайки / Дислайки (Спринт 13)
+CREATE TABLE IF NOT EXISTS review_likes (
+    review_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    is_like BOOLEAN NOT NULL,
+    PRIMARY KEY (review_id, user_id),
+    FOREIGN KEY (review_id) REFERENCES reviews(review_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
