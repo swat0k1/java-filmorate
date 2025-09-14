@@ -19,22 +19,22 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
             "INTO reviews (content, is_positive, user_id, film_id, useful)" +
             "VALUES (?, ?, ?, ?, ?)";
 
-    private static final String GET_BY_ID = "SELECT *" +
+    private static final String GET_BY_ID = "SELECT * " +
             "FROM reviews" +
             "WHERE review_id = ?";
 
-    private static final String GET_BY_FILM_ID = "SELECT *" +
+    private static final String GET_BY_FILM_ID = "SELECT * " +
             "FROM reviews" +
             "WHERE film_id";
 
-    private static final String GET_ALL = "SELECT *" +
+    private static final String GET_ALL = "SELECT * " +
             "FROM reviews";
 
     private static final String UPDATE_REVIEW = "UPDATE reviews " +
             "SET content = ?, is_positive = ?, useful = ?" +
             "WHERE review_id = ?";
 
-    private static final String DELETE_BY_ID = "DELETE" +
+    private static final String DELETE_BY_ID = "DELETE " +
             "FROM reviews" +
             "WHERE review_id = ?";
 
@@ -46,11 +46,11 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
             "INTO review_likes (review_id, user_id, is_like) " +
             "VALUES (?, ?, false)";
 
-    private static final String COUNT_LIKES = "SELECT COUNT(*)" +
+    private static final String COUNT_LIKES = "SELECT COUNT(*) " +
             "FROM review_likes" +
             "WHERE review_id = ? AND is_like = true";
 
-    private static final String COUNT_DISLIKES = "SELECT COUNT(*)" +
+    private static final String COUNT_DISLIKES = "SELECT COUNT(*) " +
             "FROM review_likes" +
             "WHERE review_id = ? AND is_like = false";
 
