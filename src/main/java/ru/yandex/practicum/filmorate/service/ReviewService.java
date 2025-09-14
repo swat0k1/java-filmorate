@@ -3,12 +3,18 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.InternalServerException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.ReviewStorage;
+import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -16,9 +22,13 @@ import java.util.List;
 public class ReviewService {
 
     private final ReviewStorage reviewStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
     //TODO: возможно тут нужно будет добавить что то связанное с лентой событий
 
     public Review addReview(Review review) {
+
+        checkUserFilm(review.getUserId(), review.getFilmId());
 
         review.setUseful(0);
         Review reviewDb = reviewStorage.addReview(review);
@@ -29,6 +39,7 @@ public class ReviewService {
     }
 
     public Review getReview(int reviewId) {
+        checkReview(reviewId);
         return reviewStorage.getReview(reviewId);
     }
 
@@ -43,6 +54,8 @@ public class ReviewService {
 
         int newReviewId = review.getReviewId();
         Review reviewDb = getReview(newReviewId);
+
+        checkUserFilm(review.getUserId(), review.getFilmId());
 
         reviewDb.setContent(review.getContent());
         reviewDb.setIsPositive(review.getIsPositive());
@@ -70,6 +83,8 @@ public class ReviewService {
 
     public Review addUsersLike(int reviewId, int userId) {
 
+        checkReviewUser(reviewId, userId);
+
         if (reviewStorage.hasUsersLike(reviewId, userId)) {
             return getReview(reviewId);
         } else if (reviewStorage.hasUsersDislike(reviewId, userId)) {
@@ -83,6 +98,8 @@ public class ReviewService {
     }
 
     public Review addUsersDislike(int reviewId, int userId) {
+
+        checkReviewUser(reviewId, userId);
 
         if (reviewStorage.hasUsersDislike(reviewId, userId)) {
             return getReview(reviewId);
@@ -98,6 +115,8 @@ public class ReviewService {
 
     public Review deleteUsersLike(int reviewId, int userId) {
 
+        checkReviewUser(reviewId, userId);
+
         if (reviewStorage.hasUsersLike(reviewId, userId)) {
             reviewStorage.deleteUsersLike(reviewId, userId);
             //TODO: место для реализации ленты событий
@@ -107,6 +126,8 @@ public class ReviewService {
     }
 
     public Review deleteUsersDislike(int reviewId, int userId) {
+
+        checkReviewUser(reviewId, userId);
 
         if (reviewStorage.hasUsersDislike(reviewId, userId)) {
             reviewStorage.deleteUsersDislike(reviewId, userId);
@@ -122,6 +143,52 @@ public class ReviewService {
         review.setUseful(reviewStorage.getAmountOfLikes(reviewId) - reviewStorage.getAmountOfDislikes(reviewId));
         return reviewStorage.updateReview(review);
 
+    }
+
+    private void checkUserFilm(int userId, int filmId) {
+
+        if (userId == 0) {
+            throw new ValidationException("Ошибка id пользователя");
+        }
+
+        if (filmId == 0) {
+            throw new ValidationException("Ошибка id фильма");
+        }
+
+        if (userStorage.getUserById(userId) == null) {
+            throw new InternalServerException("Пользователь id = " + userId + " не найден!");
+        }
+
+        if (filmStorage.getFilmById(filmId) == null) {
+            throw new InternalServerException("Фильм id = " + userId + " не найден!");
+        }
+
+    }
+
+    private void checkReviewUser(int reviewId, int userId) {
+        try {
+            Optional<Review> reviewResult = Optional.ofNullable(reviewStorage.getReview(reviewId));
+            if (reviewResult.isEmpty()) {
+                throw new InternalServerException("Отзыв id = " + reviewId + " не найден!");
+            }
+        } catch (EmptyResultDataAccessException ex) {
+            throw new InternalServerException("Отзыв id = " + reviewId + " не найден!");
+        }
+
+        if (userStorage.getUserById(userId) == null) {
+            throw new InternalServerException("Пользователь id = " + userId + " не найден!");
+        }
+    }
+
+    private void checkReview(int id) {
+        try {
+            Optional<Review> result = Optional.ofNullable(reviewStorage.getReview(id));
+            if (result.isEmpty()) {
+                throw new InternalServerException("Отзыв id = " + id + " не найден!");
+            }
+        } catch (EmptyResultDataAccessException ex) {
+            throw new InternalServerException("Отзыв id = " + id + " не найден!");
+        }
     }
 
 }

@@ -25,7 +25,7 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
 
     private static final String GET_BY_FILM_ID = "SELECT * " +
             "FROM reviews " +
-            "WHERE film_id";
+            "WHERE film_id = ?";
 
     private static final String GET_ALL = "SELECT * " +
             "FROM reviews";
@@ -146,7 +146,7 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
                     review.getContent(),
                     review.getIsPositive(),
                     review.getUseful(),
-                    review.getUserId());
+                    review.getReviewId());
 
             return getReview(review.getReviewId());
 
@@ -215,7 +215,7 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
     public void addUsersLike(int reviewId, int userId) {
 
         try {
-            insert(ADD_LIKE, reviewId, userId);
+            insertVoid(ADD_LIKE, reviewId, userId);
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка добавления лайка.");
         }
@@ -226,7 +226,7 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
     public void addUsersDislike(int reviewId, int userId) {
 
         try {
-            insert(ADD_DISLIKE, reviewId, userId);
+            insertVoid(ADD_DISLIKE, reviewId, userId);
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка добавления дислайка.");
         }
