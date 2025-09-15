@@ -137,7 +137,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
 
             List<Object[]> batchArgs = new ArrayList<>();
 
-            for(Director director : film.getDirectors()) {
+            for (Director director : film.getDirectors()) {
                 batchArgs.add(new Object[]{film.getId(), director.getId()});
             }
 
