@@ -37,13 +37,6 @@ public class DirectorDbStorage extends BaseRepository<Director> {
                                                         "FROM director " +
                                                         "WHERE id = ?";
 
-    private static final String DELETE_ALL_FILM_DIRECTOR = "DELETE " +
-                                                            "FROM film_director";
-
-    private static final String DELETE_DIRECTOR_FROM_FILM_BY_DIRECTOR_ID = "DELETE " +
-                                                                            "FROM film_director " +
-                                                                            "WHERE director_id = ?";
-
     private static final String GET_LAST_ID = "SELECT MAX(id) " +
                                                 "FROM director";
 
