@@ -45,6 +45,11 @@ public class FilmController {
         return new ResponseEntity<>(film, HttpStatus.OK);
     }
 
+    @GetMapping("/director/{directorId}")
+    public List<Film> getFilmByDirector(@PathVariable int directorId, @RequestParam String sortBy) {
+        return filmService.getFilmByDirector(directorId, sortBy);
+    }
+
     @GetMapping
     public ResponseEntity<Collection<Film>> getAllFilms() {
         Collection<Film> films = filmService.getAllFilms();

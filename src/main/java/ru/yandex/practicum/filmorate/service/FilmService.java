@@ -3,11 +3,13 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.dbStorage.LikeDbStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -16,6 +18,7 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
     private final LikeDbStorage likeDbStorage;
+    private final DirectorService directorService;
 
     public Film addFilm(Film film) {
         return filmStorage.addFilm(film);
@@ -41,6 +44,20 @@ public class FilmService {
 
     public Film getFilmById(int filmId) {
         return filmStorage.getFilmById(filmId);
+    }
+
+    public List<Film> getFilmByDirector(int id, String sort) {
+
+        List<Film> films;
+
+        if (sort.equals("year") || sort.equals("likes")) {
+            films = filmStorage.getFilmsByDirector(id, sort);
+        } else {
+            throw new InternalServerException("Метод" + sort + "сортировки не поддерживается");
+        }
+
+        return films;
+
     }
 
     public Collection<Film> getTopFilms(int count) {

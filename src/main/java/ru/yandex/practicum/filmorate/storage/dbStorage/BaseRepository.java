@@ -66,6 +66,10 @@ public class BaseRepository<T> {
         return jdbc.query(query, rowMapper, params);
     }
 
+    protected List<Integer> findList(String query, Object... params) {
+        return jdbc.queryForList(query, Integer.class, params);
+    }
+
     protected void batchUpdateBase(String query, BatchPreparedStatementSetter bps) {
         int[] rowsUpdated = jdbc.batchUpdate(query, bps);
         if (rowsUpdated.length == 0) {

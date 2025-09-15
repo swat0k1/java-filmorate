@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exception.FindingException;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Director;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -43,6 +44,15 @@ public class DirectorDbStorage extends BaseRepository<Director> {
                                                                             "FROM film_director " +
                                                                             "WHERE director_id = ?";
 
+    private static final String GET_LAST_ID = "SELECT MAX(id) " +
+                                                "FROM director";
+
+    private static final String GET_FILMS_DIRECTOR = "SELECT id, director_name " +
+                                                    "FROM director d, film_director fd " +
+                                                    "WHERE d.id = fd.director_id AND fd.film_id = ?";
+
+
+
     public DirectorDbStorage(JdbcTemplate jdbc, RowMapper<Director> mapper) {
         super(jdbc, mapper, Director.class);
     }
@@ -69,6 +79,10 @@ public class DirectorDbStorage extends BaseRepository<Director> {
     public Director addDirector(Director director) {
 
         try {
+            if (director.getId() == 0) {
+                director.setId(getNextId());
+            }
+
             int id = insert(ADD_DIRECTOR,
                     director.getId(),
                     director.getName());
@@ -85,9 +99,13 @@ public class DirectorDbStorage extends BaseRepository<Director> {
     public Director updateDirector(Director director) {
 
         try {
+            if (director.getId() >= getNextId()) {
+                throw new FindingException("Режиссер с id = " + director.getId() + "не найден");
+            }
+
             update(UPDATE_DIRECTOR,
-                    director.getId(),
-                    director.getName());
+                    director.getName(),
+                    director.getId());
 
             return getDirector(director.getId());
 
@@ -116,4 +134,27 @@ public class DirectorDbStorage extends BaseRepository<Director> {
         }
 
     }
+
+    public int getNextId() {
+
+        Integer nextId = jdbc.queryForObject(GET_LAST_ID, Integer.class);
+
+        if (nextId == null) {
+            return 1;
+        } else {
+            return nextId + 1;
+        }
+
+    }
+
+    public Collection<Director> getDirectorOfFilm(int filmId) {
+
+        try {
+            return findMany(GET_FILMS_DIRECTOR, filmId);
+        } catch (InternalServerException e) {
+            throw new InternalServerException("Ошибка получения режиссера фильма.");
+        }
+
+    }
+
 }
