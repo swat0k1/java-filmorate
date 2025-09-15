@@ -117,7 +117,7 @@ public class FilmDbStorageTest {
         userDbStorage.createUser(user1);
         likeDbStorage.addLike(1, 1);
 
-        Film film = filmDbStorage.getTopFilms(1).iterator().next();
+        Film film = filmDbStorage.getTopFilms(1, 1, 2000).iterator().next();
         assertThat(film).hasFieldOrPropertyWithValue("name", "TestName");
     }
 }

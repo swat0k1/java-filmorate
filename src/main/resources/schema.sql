@@ -1,3 +1,9 @@
+DROP TABLE film_genres;
+DROP TABLE film_likes;
+DROP TABLE user_friends;
+DROP TABLE users;
+DROP TABLE films;
+
 CREATE TABLE IF NOT EXISTS rating_MPA (
     mpa_id SERIAL NOT NULL PRIMARY KEY,
     mpa_name VARCHAR NOT NULL

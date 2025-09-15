@@ -47,4 +47,10 @@ public class ErrorHandler {
     public ErrorResponse handleRuntime(final RuntimeException e) {
         return new ErrorResponse("Произошла непредвиденная ошибка. " + e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMissingParam(final MissingParameterException e) {
+        return new ErrorResponse("Пропущен параметр " + e.getMessage());
+    }
 }

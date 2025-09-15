@@ -18,38 +18,38 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
     private FriendDbStorage friendDbStorage;
 
     private static final String INSERT = "INSERT " +
-                                            "INTO users (email, login, name, birthday) " +
-                                            "VALUES (?, ?, ?, ?)";
+            "INTO users (email, login, name, birthday) " +
+            "VALUES (?, ?, ?, ?)";
 
     private static final String UPDATE = "UPDATE users " +
-                                            "SET email = ?, login = ?, " +
-                                            "name = ?, birthday = ? " +
-                                            "WHERE id = ?";
+            "SET email = ?, login = ?, " +
+            "name = ?, birthday = ? " +
+            "WHERE id = ?";
 
     private static final String FIND_ALL = "SELECT * " +
-                                            "FROM users";
+            "FROM users";
 
     private static final String FIND_BY_ID = "SELECT * " +
-                                                "FROM users " +
-                                                "WHERE id = ?";
+            "FROM users " +
+            "WHERE id = ?";
 
     private static final String DELETE = "DELETE " +
-                                            "FROM users " +
-                                            "WHERE id = ?";
+            "FROM users " +
+            "WHERE id = ?";
 
     private static final String FIND_MANY = "SELECT * " +
-                                                "FROM users " +
-                                                "WHERE id IN (%s)";
+            "FROM users " +
+            "WHERE id IN (%s)";
 
     private static final String FIND_COMMON_FRIENDS = "SELECT id " +
-                                                        "FROM users " +
-                                                        "WHERE id IN " +
-                                                            "(SELECT friend_id " +
-                                                            "FROM user_friends " +
-                                                            "WHERE user_id = ?) AND id IN " +
-                                                            "(SELECT friend_id " +
-                                                            "FROM user_friends " +
-                                                            "WHERE user_id = ?);";
+            "FROM users " +
+            "WHERE id IN " +
+            "(SELECT friend_id " +
+            "FROM user_friends " +
+            "WHERE user_id = ?) AND id IN " +
+            "(SELECT friend_id " +
+            "FROM user_friends " +
+            "WHERE user_id = ?);";
 
     public UserDbStorage(JdbcTemplate jdbc, RowMapper<User> mapper, FriendDbStorage friendDbStorage) {
         super(jdbc, mapper, User.class);

@@ -15,23 +15,23 @@ import java.util.Map;
 public class LikeDbStorage extends BaseRepository<Film> {
 
     private static final String INSERT = "INSERT " +
-                                        "INTO film_likes (film_id, user_liked_id) " +
-                                        "VALUES (?, ?)";
+            "INTO film_likes (film_id, user_liked_id) " +
+            "VALUES (?, ?)";
 
     private static final String FIND_FILMS_LIKE = "SELECT user_liked_id " +
-                                                    "FROM film_likes " +
-                                                    "WHERE film_id = ?";
+            "FROM film_likes " +
+            "WHERE film_id = ?";
 
     private static final String DELETE = "DELETE " +
-                                            "FROM film_likes " +
-                                            "WHERE film_id = ? AND user_liked_id = ?";
+            "FROM film_likes " +
+            "WHERE film_id = ? AND user_liked_id = ?";
 
     private static final String DELETE_ALL_FILM_LIKES = "DELETE " +
-                                                        "FROM film_likes " +
-                                                        "WHERE film_id = ?";
+            "FROM film_likes " +
+            "WHERE film_id = ?";
 
     private static final String FIND_ALL_FILMS_LIKES = "SELECT * " +
-                                                        "FROM film_likes";
+            "FROM film_likes";
 
     public LikeDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper, Film.class);
