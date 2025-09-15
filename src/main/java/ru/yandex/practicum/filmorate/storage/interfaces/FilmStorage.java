@@ -16,6 +16,5 @@ public interface FilmStorage {
 
     Film deleteFilm(int id);
 
-    Collection<Film> getTopFilms(int count);
-
+    Collection<Film> getTopFilms(Integer count, Integer genreId, Integer year);
 }

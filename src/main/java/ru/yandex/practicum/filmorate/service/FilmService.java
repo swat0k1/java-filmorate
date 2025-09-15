@@ -43,12 +43,11 @@ public class FilmService {
         return filmStorage.getFilmById(filmId);
     }
 
-    public Collection<Film> getTopFilms(int count) {
-        return filmStorage.getTopFilms(count);
+    public Collection<Film> getTopFilms(Integer count, Integer genreId, Integer year) {
+        return filmStorage.getTopFilms(count, genreId, year);
     }
 
     public Film delete(int id) {
         return filmStorage.deleteFilm(id);
     }
-
 }
