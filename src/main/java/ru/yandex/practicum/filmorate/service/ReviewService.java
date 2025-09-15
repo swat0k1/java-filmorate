@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.dbStorage.ReviewDbStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.interfaces.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 import java.util.Comparator;
@@ -21,7 +21,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ReviewService {
 
-    private final ReviewStorage reviewStorage;
+    private final ReviewDbStorage reviewStorage;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     //TODO: возможно тут нужно будет добавить что то связанное с лентой событий

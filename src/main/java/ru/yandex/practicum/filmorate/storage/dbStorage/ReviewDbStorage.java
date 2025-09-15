@@ -7,13 +7,12 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.FindingException;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.storage.interfaces.ReviewStorage;
 
 import java.util.List;
 
 @Slf4j
 @Repository
-public class ReviewDbStorage extends BaseRepository<Review> implements ReviewStorage {
+public class ReviewDbStorage extends BaseRepository<Review> {
 
     private static final String INSERT_REVIEW = "INSERT " +
             "INTO reviews (content, is_positive, user_id, film_id, useful) " +
@@ -38,41 +37,23 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
             "FROM reviews " +
             "WHERE review_id = ?";
 
-    private static final String ADD_LIKE = "INSERT " +
+    private static final String ADD_LIKE_DISLIKE = "INSERT " +
             "INTO review_likes (review_id, user_id, is_like) " +
-            "VALUES (?, ?, true)";
+            "VALUES (?, ?, ?)";
 
-    private static final String ADD_DISLIKE = "INSERT " +
-            "INTO review_likes (review_id, user_id, is_like) " +
-            "VALUES (?, ?, false)";
-
-    private static final String COUNT_LIKES = "SELECT COUNT(*) " +
+    private static final String COUNT_LIKES_DISLIKES = "SELECT COUNT(*) " +
             "FROM review_likes " +
-            "WHERE review_id = ? AND is_like = true";
+            "WHERE review_id = ? AND is_like = ?";
 
-    private static final String COUNT_DISLIKES = "SELECT COUNT(*) " +
-            "FROM review_likes " +
-            "WHERE review_id = ? AND is_like = false";
-
-    private static final String HAS_LIKE = "SELECT EXISTS(" +
+    private static final String HAS_LIKE_DISLIKE = "SELECT EXISTS(" +
             "SELECT 1 " +
             "FROM review_likes " +
-            "WHERE review_id = ? AND user_id = ? AND is_like = true" +
+            "WHERE review_id = ? AND user_id = ? AND is_like = ?" +
             ")";
 
-    private static final String HAS_DISLIKE = "SELECT EXISTS(" +
-            "SELECT 1 " +
+    private static final String DELETE_LIKE_DISLIKE = "DELETE " +
             "FROM review_likes " +
-            "WHERE review_id = ? AND user_id = ? AND is_like = false" +
-            ")";
-
-    private static final String DELETE_LIKE = "DELETE " +
-            "FROM review_likes " +
-            "WHERE review_id = ? AND user_id = ? AND is_like = true";
-
-    private static final String DELETE_DISLIKE = "DELETE " +
-            "FROM review_likes " +
-            "WHERE review_id = ? AND user_id = ? AND is_like = true";
+            "WHERE review_id = ? AND user_id = ? AND is_like = ?";
 
     private static final String DELETE_ALL_LIKES = "DELETE " +
             "FROM review_likes " +
@@ -82,7 +63,6 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
         super(jdbc, mapper, Review.class);
     }
 
-    @Override
     public Review getReview(int reviewId) {
 
         try {
@@ -94,7 +74,6 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
 
     }
 
-    @Override
     public List<Review> getAllReviews() {
 
         try {
@@ -105,7 +84,6 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
 
     }
 
-    @Override
     public List<Review> getReviewsByFilmId(int filmId) {
 
         try {
@@ -116,7 +94,6 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
 
     }
 
-    @Override
     public Review addReview(Review review) {
 
         try {
@@ -138,7 +115,6 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
 
     }
 
-    @Override
     public Review updateReview(Review review) {
 
         try {
@@ -156,7 +132,6 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
 
     }
 
-    @Override
     public void deleteReviewById(int reviewId) {
 
         try {
@@ -167,95 +142,86 @@ public class ReviewDbStorage extends BaseRepository<Review> implements ReviewSto
 
     }
 
-    @Override
     public int getAmountOfLikes(int reviewId) {
 
         try {
-            return jdbc.queryForObject(COUNT_LIKES, Integer.class, reviewId);
+            return jdbc.queryForObject(COUNT_LIKES_DISLIKES, Integer.class, reviewId, true);
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка получения количества лайков.");
         }
 
     }
 
-    @Override
     public int getAmountOfDislikes(int reviewId) {
 
         try {
-            return jdbc.queryForObject(COUNT_DISLIKES, Integer.class, reviewId);
+            return jdbc.queryForObject(COUNT_LIKES_DISLIKES, Integer.class, reviewId, false);
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка получения количества дислайков.");
         }
 
     }
 
-    @Override
     public boolean hasUsersLike(int reviewId, int userId) {
 
         try {
-            return Boolean.TRUE.equals(jdbc.queryForObject(HAS_LIKE, Boolean.class, reviewId, userId));
+            return Boolean.TRUE.equals(jdbc.queryForObject(HAS_LIKE_DISLIKE, Boolean.class, reviewId, userId, true));
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка проверки наличия лайка.");
         }
 
     }
 
-    @Override
     public boolean hasUsersDislike(int reviewId, int userId) {
 
         try {
-            return Boolean.TRUE.equals(jdbc.queryForObject(HAS_DISLIKE, Boolean.class, reviewId, userId));
+            return Boolean.TRUE.equals(jdbc.queryForObject(HAS_LIKE_DISLIKE, Boolean.class, reviewId, userId, false));
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка проверки наличия дислайка.");
         }
 
     }
 
-    @Override
     public void addUsersLike(int reviewId, int userId) {
 
         try {
-            insertVoid(ADD_LIKE, reviewId, userId);
+            update(ADD_LIKE_DISLIKE, reviewId, userId, true);
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка добавления лайка.");
         }
 
     }
 
-    @Override
     public void addUsersDislike(int reviewId, int userId) {
 
         try {
-            insertVoid(ADD_DISLIKE, reviewId, userId);
+            update(ADD_LIKE_DISLIKE, reviewId, userId, false);
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка добавления дислайка.");
         }
 
     }
 
-    @Override
     public void deleteUsersLike(int reviewId, int userId) {
 
         try {
-            jdbc.update(DELETE_LIKE, reviewId, userId);
+            jdbc.update(DELETE_LIKE_DISLIKE, reviewId, userId, true);
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка удаления лайка.");
         }
 
     }
 
-    @Override
     public void deleteUsersDislike(int reviewId, int userId) {
 
         try {
-            jdbc.update(DELETE_DISLIKE, reviewId, userId);
+            jdbc.update(DELETE_LIKE_DISLIKE, reviewId, userId, false);
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка удаления дислайка.");
         }
 
     }
 
-    @Override
     public void deleteAllLikesByReviewId(int reviewId) {
 
         try {

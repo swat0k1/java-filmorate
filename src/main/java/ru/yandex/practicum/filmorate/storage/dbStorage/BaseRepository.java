@@ -46,15 +46,6 @@ public class BaseRepository<T> {
         }
     }
 
-    protected void insertVoid(String query, Object... params) {
-        int rowsUpdated = jdbc.update(query, params);
-
-        if (rowsUpdated == 0) {
-            throw new InternalServerException("Не удалось сохранить данные");
-        }
-
-    }
-
     protected void update(String query, Object... params) {
         int rowsUpdated = jdbc.update(query, params);
         if (rowsUpdated == 0) {
