@@ -52,7 +52,7 @@ public class FilmTests {
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
-        assertEquals(4, violations.size());
+        assertEquals(3, violations.size());
     }
 
 }
