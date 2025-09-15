@@ -4,11 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dbStorage.FriendDbStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
-import java.util.*;
+import java.util.Collection;
 
 @Slf4j
 @Service
@@ -72,4 +73,9 @@ public class UserService {
         return userStorage.deleteUser(id);
     }
 
+    public Collection<Film> getRecommendations(int id) {
+        User user = userStorage.getUserById(id);
+        if (user == null) log.warn("Пользователь с id = {} не найден", id);
+        return userStorage.getRecommendations(id);
+    }
 }
