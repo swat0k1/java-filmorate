@@ -72,4 +72,11 @@ public class BaseRepository<T> {
             throw new FindingException("Ошибка обновления данных");
         }
     }
+
+    protected void delete(String query, long id) {
+        int rowsDeleted = jdbc.update(query, id);
+        if (rowsDeleted == 0) {
+            throw new InternalServerException("Ошибка удаления данных");
+        }
+    }
 }
