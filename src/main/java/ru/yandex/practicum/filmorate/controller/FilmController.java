@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/films")
@@ -44,6 +45,11 @@ public class FilmController {
             throw new ValidationException("Фильм не найден!");
         }
         return new ResponseEntity<>(film, HttpStatus.OK);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getFilmByDirector(@PathVariable int directorId, @RequestParam String sortBy) {
+        return filmService.getFilmByDirector(directorId, sortBy);
     }
 
     @GetMapping

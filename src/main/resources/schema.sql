@@ -67,3 +67,16 @@ CREATE TABLE IF NOT EXISTS review_likes (
     is_like BOOLEAN NOT NULL,
     PRIMARY KEY (review_id, user_id)
 );
+
+-- Функциональность Режиссеры (Спринт 13)
+CREATE TABLE IF NOT EXISTS director (
+    id BIGINT PRIMARY KEY,
+    director_name VARCHAR NOT NULL
+);
+
+-- Функциональность Режиссеры (Спринт 13)
+CREATE TABLE IF NOT EXISTS film_director (
+    film_id BIGINT REFERENCES films(id) ON DELETE CASCADE,
+    director_id BIGINT REFERENCES director(id) ON DELETE CASCADE,
+    PRIMARY KEY (film_id, director_id)
+);

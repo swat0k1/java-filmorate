@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.interfaces;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface FilmStorage {
 
@@ -15,6 +16,8 @@ public interface FilmStorage {
     Film getFilmById(int id);
 
     Film deleteFilm(int id);
+
+    public List<Film> getFilmsByDirector(int id, String sort);
 
     Collection<Film> getTopFilms(Integer count, Integer genreId, Integer year);
 }

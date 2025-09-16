@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.FindingException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -18,6 +19,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
     private MpaDbStorage mpaDbStorage;
     private GenreDbStorage genreDbStorage;
     private LikeDbStorage likeDbStorage;
+    private DirectorDbStorage directorDbStorage;
 
     private static final String INSERT = "INSERT " +
             "INTO films (name, description, release_date, duration, rating_id) " +
@@ -80,12 +82,34 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
                     "ORDER BY likes DESC";
 
 
+    private static final String GET_FILMS_DIRECTOR_YEAR = "SELECT film_.id " +
+                                                            "FROM films AS film_ " +
+                                                            "INNER JOIN film_director AS film_dir ON film_dir.film_id = film_.id " +
+                                                            "WHERE film_dir.director_id = ? " +
+                                                            "ORDER BY EXTRACT(YEAR FROM film_.release_date)";
+
+    private static final String GET_FILMS_DIRECTOR_LIKES = "SELECT f.id " +
+                                                            "FROM films f " +
+                                                            "JOIN film_director fd ON f.id = fd.film_id " +
+                                                            "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
+                                                            "WHERE fd.director_id = ? " +
+                                                            "GROUP BY f.id " +
+                                                            "ORDER BY COUNT(fl.film_id) DESC";
+
+    private static final String GET_ALL_DIRECTOR_ID = "SELECT id " +
+                                                        "FROM director";
+
+    private static final String ADD_FILM_DIRECTOR = "INSERT " +
+                                                    "INTO film_director (film_id, director_id) " +
+                                                    "VALUES (?, ?)";
+
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper, MpaDbStorage mpaDbStorage,
-                         GenreDbStorage genreDbStorage, LikeDbStorage likeDbStorage) {
+                         GenreDbStorage genreDbStorage, LikeDbStorage likeDbStorage, DirectorDbStorage directorDbStorage) {
         super(jdbc, mapper, Film.class);
         this.mpaDbStorage = mpaDbStorage;
         this.genreDbStorage = genreDbStorage;
         this.likeDbStorage = likeDbStorage;
+        this.directorDbStorage = directorDbStorage;
     }
 
     @Override
@@ -105,6 +129,24 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
         film.setMpa(mpa);
         film.setGenres(new LinkedHashSet<>(genres));
         genreDbStorage.setFilmGenres(film.getId(), film.getGenres());
+
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+
+            Set<Integer> directorsId = new HashSet<>(jdbc.queryForList(GET_ALL_DIRECTOR_ID, Integer.class));
+            List<Object[]> batchArgs = new ArrayList<>();
+
+            for (Director director : film.getDirectors()) {
+                if (directorsId.contains(director.getId())) {
+                    batchArgs.add(new Object[]{film.getId(), director.getId()});
+                } else {
+                    throw new FindingException("Не найден режиссер id = " + director.getId());
+                }
+            }
+
+            jdbc.batchUpdate(ADD_FILM_DIRECTOR, batchArgs);
+
+        }
+
         return film;
     }
 
@@ -120,6 +162,19 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
                 film.getMpa().getId(),
                 film.getId()
         );
+
+        if (!film.getDirectors().isEmpty()) {
+
+            List<Object[]> batchArgs = new ArrayList<>();
+
+            for (Director director : film.getDirectors()) {
+                batchArgs.add(new Object[]{film.getId(), director.getId()});
+            }
+
+            jdbc.batchUpdate(ADD_FILM_DIRECTOR, batchArgs);
+
+        }
+
         return getFilmById(film.getId());
     }
 
@@ -141,7 +196,28 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
                 .orElseThrow(() -> new FindingException("Фильм с id = " + id + " не найден"));
         film.setGenres(new HashSet<>(genreDbStorage.findByFilmId(id)));
         film.setLikes(likeDbStorage.getFilmLikes(id));
+        film.setDirectors(new HashSet<>(directorDbStorage.getDirectorOfFilm(id)));
         return film;
+    }
+
+    @Override
+    public List<Film> getFilmsByDirector(int id, String sort) {
+
+        List<Integer> filmsId;
+
+        if (sort.equals("year")) {
+            filmsId = findList(GET_FILMS_DIRECTOR_YEAR, id);
+        } else {
+            filmsId = findList(GET_FILMS_DIRECTOR_LIKES, id);
+        }
+
+        List<Film> films = new ArrayList<>();
+
+        for (Integer filmId : filmsId) {
+            films.add(getFilmById(filmId));
+        }
+
+        return films;
     }
 
     @Override
