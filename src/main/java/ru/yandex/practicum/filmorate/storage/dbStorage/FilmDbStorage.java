@@ -107,7 +107,9 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
             "FROM film_likes fl1 " +
             "JOIN film_likes fl2 " +
             "ON fl1.film_id = fl2.film_id " +
-            "WHERE fl1.user_liked_id = ? AND fl2.user_liked_id = ?";
+            "WHERE fl1.user_liked_id = ? AND fl2.user_liked_id = ?" +
+            "GROUP BY fl1.film_id " +
+            "ORDER BY (SELECT COUNT(user_liked_id) FROM film_likes WHERE film_id = fl1.film_id) DESC";
 
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper, MpaDbStorage mpaDbStorage,
                          GenreDbStorage genreDbStorage, LikeDbStorage likeDbStorage, DirectorDbStorage directorDbStorage) {
@@ -266,6 +268,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
         for (Integer filmId : commonFilmsId) {
             commonFilms.add(getFilmById(filmId));
         }
+
         return commonFilms;
     }
 }
