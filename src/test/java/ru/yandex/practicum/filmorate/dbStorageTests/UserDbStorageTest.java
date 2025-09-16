@@ -13,10 +13,10 @@ import ru.yandex.practicum.filmorate.storage.dbStorage.FriendDbStorage;
 import ru.yandex.practicum.filmorate.storage.dbStorage.UserDbStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.UserRowMapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.LocalDate;
 import java.util.Collection;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -34,9 +34,9 @@ public class UserDbStorageTest {
 
     @BeforeEach
     void setUp() {
-        user1 = createUser(1,"test1@test.ru", "test1", "test1", LocalDate.of(2001, 1, 1));
-        user2 = createUser(2,"test2@test.ru", "test2", "test2", LocalDate.of(2002, 1, 1));
-        user3 = createUser(3,"test3@test.ru", "test3", "test3", LocalDate.of(2003, 1, 1));
+        user1 = createUser(1, "test1@test.ru", "test1", "test1", LocalDate.of(2001, 1, 1));
+        user2 = createUser(2, "test2@test.ru", "test2", "test2", LocalDate.of(2002, 1, 1));
+        user3 = createUser(3, "test3@test.ru", "test3", "test3", LocalDate.of(2003, 1, 1));
     }
 
     private User createUser(int id, String email, String login, String name, LocalDate birthday) {
