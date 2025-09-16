@@ -13,10 +13,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dbStorage.*;
-import ru.yandex.practicum.filmorate.storage.mappers.FilmRowMapper;
-import ru.yandex.practicum.filmorate.storage.mappers.GenreRowMapper;
-import ru.yandex.practicum.filmorate.storage.mappers.MpaRowMapper;
-import ru.yandex.practicum.filmorate.storage.mappers.UserRowMapper;
+import ru.yandex.practicum.filmorate.storage.mappers.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -36,7 +33,9 @@ import static org.assertj.core.api.Assertions.assertThat;
         GenreRowMapper.class,
         UserDbStorage.class,
         UserRowMapper.class,
-        FriendDbStorage.class})
+        FriendDbStorage.class,
+        DirectorDbStorage.class,
+        DirectorRowMapper.class})
 @JdbcTest
 
 public class FilmDbStorageTest {
@@ -45,6 +44,7 @@ public class FilmDbStorageTest {
     private final LikeDbStorage likeDbStorage;
     private final UserDbStorage userDbStorage;
     private final GenreDbStorage genreDbStorage;
+    private final DirectorDbStorage directorDbStorage;
 
     private Film film1;
     private Film film2;
@@ -117,7 +117,7 @@ public class FilmDbStorageTest {
         userDbStorage.createUser(user1);
         likeDbStorage.addLike(1, 1);
 
-        Film film = filmDbStorage.getTopFilms(1).iterator().next();
+        Film film = filmDbStorage.getTopFilms(1, 1, 2000).iterator().next();
         assertThat(film).hasFieldOrPropertyWithValue("name", "TestName");
     }
 }

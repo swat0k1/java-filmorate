@@ -16,32 +16,32 @@ import java.util.*;
 public class GenreDbStorage extends BaseRepository<Genre> {
 
     private static final String INSERT = "INSERT " +
-                                        "INTO film_genres (film_id, genre_id) " +
-                                        "VALUES (?, ?)";
+            "INTO film_genres (film_id, genre_id) " +
+            "VALUES (?, ?)";
 
     private static final String FIND_BY_ID = "SELECT * " +
-                                            "FROM genres " +
-                                            "WHERE id = ?";
+            "FROM genres " +
+            "WHERE id = ?";
 
     private static final String FIND_MANY = "SELECT * " +
-                                            "FROM genres " +
-                                            "WHERE id IN (%s)";
+            "FROM genres " +
+            "WHERE id IN (%s)";
 
     private static final String FIND_ALL = "SELECT * " +
-                                            "FROM genres";
+            "FROM genres";
 
     private static final String FIND_BY_FILM_ID = "SELECT id, name " +
-                                                    "FROM genres g, film_genres fg " +
-                                                    "WHERE g.id = fg.genre_id AND fg.film_id = ?";
+            "FROM genres g, film_genres fg " +
+            "WHERE g.id = fg.genre_id AND fg.film_id = ?";
 
     private static final String FIND_ALL_FILMS_GENRES = "SELECT film_id, genre_id, name " +
-                                                        "FROM film_genres fg, " +
-                                                        "genres g " +
-                                                        "WHERE fg.genre_id = g.id";
+            "FROM film_genres fg, " +
+            "genres g " +
+            "WHERE fg.genre_id = g.id";
 
     private static final String DELETE_ALL_GENRES_FILM = "DELETE " +
-                                                        "FROM film_genres " +
-                                                        "WHERE film_id = ?";
+            "FROM film_genres " +
+            "WHERE film_id = ?";
 
     public GenreDbStorage(JdbcTemplate jdbc, RowMapper<Genre> mapper) {
         super(jdbc, mapper, Genre.class);

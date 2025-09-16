@@ -54,7 +54,6 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
     private static final String FIND_ALL_USER_LIKES = "SELECT * " +
             "FROM film_likes";
 
-
     public UserDbStorage(JdbcTemplate jdbc, RowMapper<User> mapper, FriendDbStorage friendDbStorage) {
         super(jdbc, mapper, User.class);
         this.friendDbStorage = friendDbStorage;

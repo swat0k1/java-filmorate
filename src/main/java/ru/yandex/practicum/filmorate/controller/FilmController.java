@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,8 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("/films")
@@ -45,6 +47,11 @@ public class FilmController {
         return new ResponseEntity<>(film, HttpStatus.OK);
     }
 
+    @GetMapping("/director/{directorId}")
+    public List<Film> getFilmByDirector(@PathVariable int directorId, @RequestParam String sortBy) {
+        return filmService.getFilmByDirector(directorId, sortBy);
+    }
+
     @GetMapping
     public ResponseEntity<Collection<Film>> getAllFilms() {
         Collection<Film> films = filmService.getAllFilms();
@@ -64,9 +71,11 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public ResponseEntity<Collection<Film>> getTopFilms(@RequestParam(name = "count",
-                                                        defaultValue = "10", required = false) int count) {
-        Collection<Film> topFilms = filmService.getTopFilms(count);
+    public ResponseEntity<Collection<Film>> getTopFilms(
+            @RequestParam(name = "count", required = false) @Positive Integer count,
+            @RequestParam(name = "genreId", required = false) @Positive Integer genreId,
+            @RequestParam(name = "year", required = false) @Positive Integer year) {
+        Collection<Film> topFilms = filmService.getTopFilms(count, genreId, year);
         return new ResponseEntity<>(topFilms, HttpStatus.OK);
     }
 
