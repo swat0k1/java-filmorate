@@ -19,10 +19,6 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
 
     private FriendDbStorage friendDbStorage;
 
-    // !! Внедрение зависимости для работы метода Collection<Film> getRecommendations(int id)
-    @Autowired
-    FilmDbStorage filmDbStorage;
-
     private static final String INSERT = "INSERT " +
             "INTO users (email, login, name, birthday) " +
             "VALUES (?, ?, ?, ?)";
@@ -145,7 +141,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
         return findMany(friends);
     }
 
-    public Collection<Film> getRecommendations(int id) {
+    public Set<Integer> getRecommendations(int id) {
         // Карта, в которой ключ = id пользователя, а значение = множество id фильмов, которые он лайкнул
         HashMap<Integer, Set<Integer>> allUsersLike = new HashMap<>();
         jdbc.query(FIND_ALL_USER_LIKES, rs -> {
@@ -159,7 +155,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
         // Множество id фильмов, которые лайкнул пользователь
         Set<Integer> usersLike = allUsersLike.get(id);
         if (usersLike == null) {
-            return new ArrayList<>();
+            return new HashSet<>();
         }
 
         // Находим множество id фильмов другого пользователя с максимальным количеством совпадений
@@ -181,7 +177,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
             }
         }
         if (maxMatches == 0) {
-            return new ArrayList<>();
+            return new HashSet<>();
         }
 
         // Исключаем из найденного множества элементы из usersLike
@@ -189,14 +185,8 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
             maxMatchLike.removeAll(usersLike);
         }
         if (maxMatches == 0) {
-            return new ArrayList<>();
+            return new HashSet<>();
         }
-
-        // Получение коллекции рекомендуемых фильмов по их id
-        Collection<Film> recommendedFilms = new HashSet<>();
-        for (int idFilm : maxMatchLike) {
-            recommendedFilms.add(filmDbStorage.getFilmById(idFilm));
-        }
-        return recommendedFilms;
+        return maxMatchLike;
     }
 }
