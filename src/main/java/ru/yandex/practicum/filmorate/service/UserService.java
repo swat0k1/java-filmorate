@@ -4,11 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.dbStorage.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.dbStorage.FriendDbStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -17,6 +22,7 @@ public class UserService {
 
     private final UserStorage userStorage;
     private FriendDbStorage friendDbStorage;
+    private FilmDbStorage filmDbStorage;
 
     public User createUser(User user) {
         return userStorage.createUser(user);
@@ -72,4 +78,16 @@ public class UserService {
         return userStorage.deleteUser(id);
     }
 
+    public Collection<Film> getRecommendations(int id) {
+        User user = userStorage.getUserById(id);
+        if (user == null) log.warn("Пользователь с id = {} не найден", id);
+        // Получение коллекции рекомендуемых фильмов по их id
+        Set<Integer> maxMatchLike = userStorage.getRecommendations(id);
+        if (maxMatchLike == null || maxMatchLike.isEmpty()) return new ArrayList<>();
+        Collection<Film> recommendedFilms = new HashSet<>();
+        for (int idFilm : maxMatchLike) {
+            recommendedFilms.add(filmDbStorage.getFilmById(idFilm));
+        }
+        return recommendedFilms;
+    }
 }

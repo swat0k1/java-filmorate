@@ -51,6 +51,9 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
             "FROM user_friends " +
             "WHERE user_id = ?);";
 
+    private static final String FIND_ALL_USER_LIKES = "SELECT * " +
+            "FROM film_likes";
+
     public UserDbStorage(JdbcTemplate jdbc, RowMapper<User> mapper, FriendDbStorage friendDbStorage) {
         super(jdbc, mapper, User.class);
         this.friendDbStorage = friendDbStorage;
@@ -133,5 +136,54 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
     public Collection<User> getCommonFriends(int firstUserId, int secondUserId) {
         Collection<Integer> friends = jdbc.queryForList(FIND_COMMON_FRIENDS, Integer.TYPE, firstUserId, secondUserId);
         return findMany(friends);
+    }
+
+    public Set<Integer> getRecommendations(int id) {
+        // Карта, в которой ключ = id пользователя, а значение = множество id фильмов, которые он лайкнул
+        HashMap<Integer, Set<Integer>> allUsersLike = new HashMap<>();
+        jdbc.query(FIND_ALL_USER_LIKES, rs -> {
+            // Возврат id пользователя
+            int userId = rs.getInt("user_liked_id");
+            // Заполнение карты данными из БД
+            Set<Integer> usersLikes = allUsersLike.computeIfAbsent(userId, key -> new HashSet<>());
+            usersLikes.add(rs.getInt("film_id"));
+        });
+
+        // Множество id фильмов, которые лайкнул пользователь
+        Set<Integer> usersLike = allUsersLike.get(id);
+        if (usersLike == null) {
+            return new HashSet<>();
+        }
+
+        // Находим множество id фильмов другого пользователя с максимальным количеством совпадений
+        Set<Integer> maxMatchLike = null;
+        int maxMatches = 0;
+
+        for (Map.Entry<Integer, Set<Integer>> entry : allUsersLike.entrySet()) {
+            Set<Integer> currentSetLike = entry.getValue();
+            // Исключаем сравнение с самим собой,
+            // либо с пользователем с абсолютно одинаковыми лайками, так как рекомендовать тогда нечего
+            if (!currentSetLike.equals(usersLike)) {
+                int matches = (int) currentSetLike.stream()
+                        .filter(usersLike::contains)
+                        .count();
+                if (matches > maxMatches) {
+                    maxMatches = matches;
+                    maxMatchLike = currentSetLike;
+                }
+            }
+        }
+        if (maxMatches == 0) {
+            return new HashSet<>();
+        }
+
+        // Исключаем из найденного множества элементы из usersLike
+        if (maxMatchLike != null) {
+            maxMatchLike.removeAll(usersLike);
+        }
+        if (maxMatches == 0) {
+            return new HashSet<>();
+        }
+        return maxMatchLike;
     }
 }
