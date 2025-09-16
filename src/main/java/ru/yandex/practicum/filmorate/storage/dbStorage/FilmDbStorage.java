@@ -50,6 +50,36 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
             "GROUP BY film_id) fl " +
             "ON f.id = fl.film_id ORDER BY likes DESC LIMIT ?";
 
+    private static final String JOIN_TABLES =
+            "SELECT * " +
+                    "FROM films f " +
+                    "LEFT JOIN rating_mpa m " +
+                    "ON f.id = m.mpa_id " +
+                    "JOIN film_genres fg ON f.id = fg.film_id " +
+                    "JOIN genres g ON fg.genre_id = g.id " +
+                    "LEFT JOIN (" +
+                    "SELECT film_id, COUNT(film_id) AS likes " +
+                    "FROM film_likes " +
+                    "GROUP BY film_id) fl " +
+                    "ON f.id = fl.film_id ";
+
+    private static final String FIND_TOP_FILMS_WITH_GENRE =
+            JOIN_TABLES +
+                    "WHERE fg.genre_id = ? " +
+                    "ORDER BY likes DESC";
+
+    private static final String FIND_TOP_FILMS_WITH_YEAR =
+            JOIN_TABLES +
+                    "WHERE EXTRACT(YEAR FROM f.release_date) = ? " +
+                    "ORDER BY likes DESC";
+
+    private static final String FIND_TOP_FILMS_WITH_GENRE_AND_YEAR =
+            JOIN_TABLES +
+                    "WHERE fg.genre_id = ? " +
+                    "AND EXTRACT(YEAR FROM f.release_date) = ? " +
+                    "ORDER BY likes DESC";
+
+
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper, MpaDbStorage mpaDbStorage,
                          GenreDbStorage genreDbStorage, LikeDbStorage likeDbStorage) {
         super(jdbc, mapper, Film.class);
@@ -122,8 +152,20 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getTopFilms(int count) {
-        Collection<Film> films = findMany(FIND_TOP_FILMS, count);
+    public Collection<Film> getTopFilms(Integer count, Integer genreId, Integer year) {
+        if (genreId == null && year == null) {
+            return getFilmsForTop(FIND_TOP_FILMS, count);
+        } else if (genreId != null && year != null) {
+            return getFilmsForTop(FIND_TOP_FILMS_WITH_GENRE_AND_YEAR, genreId, year);
+        } else if (genreId != null) {
+            return getFilmsForTop(FIND_TOP_FILMS_WITH_GENRE, genreId);
+        }
+
+        return getFilmsForTop(FIND_TOP_FILMS_WITH_YEAR, year);
+    }
+
+    private Collection<Film> getFilmsForTop(String sql, Object... args) {
+        Collection<Film> films = findMany(sql, args);
         Map<Integer, Set<Genre>> genres = genreDbStorage.findAllFilmsGenres();
         Map<Integer, Collection<Integer>> likes = likeDbStorage.findAllFilmsLikes();
         for (Film film : films) {

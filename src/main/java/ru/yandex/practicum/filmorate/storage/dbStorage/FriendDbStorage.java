@@ -29,6 +29,11 @@ public class FriendDbStorage extends BaseRepository<User> {
             "FROM user_friends " +
             "WHERE user_id = ? AND friend_id = ?";
 
+    private static final String DELETE_ALL_USER_FRIENDS = "DELETE " +
+            "FROM user_friends " +
+            "WHERE user_id = ? " +
+            "OR friend_id = ?";
+
     public FriendDbStorage(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper, User.class);
     }
