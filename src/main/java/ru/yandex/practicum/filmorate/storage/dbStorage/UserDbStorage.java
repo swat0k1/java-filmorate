@@ -110,8 +110,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
     @Override
     public User deleteUser(int id) {
         User user = getUserById(id);
-        if (!user.getFriends().isEmpty()) friendDbStorage.deleteAllUserFriends(id);
-        update(DELETE, id);
+        delete(DELETE, id);
         return user;
     }
 

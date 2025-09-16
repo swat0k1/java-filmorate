@@ -70,8 +70,4 @@ public class FriendDbStorage extends BaseRepository<User> {
             throw new FindingException(e.getMessage());
         }
     }
-
-    public void deleteAllUserFriends(int userId) {
-        update(DELETE_ALL_USER_FRIENDS, userId, userId);
-    }
 }

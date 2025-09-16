@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS films (
     description VARCHAR,
     release_date TIMESTAMP,
     duration BIGINT,
-    rating_id INT NOT NULL REFERENCES rating_MPA(mpa_id)
+    rating_id INT NOT NULL REFERENCES rating_MPA(mpa_id) ON DELETE RESTRICT
 );
 
 -- Жанры (Спринт 12)
@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS genres (
 
 -- Жанры - Фильмы (Спринт 12)
 CREATE TABLE IF NOT EXISTS film_genres (
-    film_id BIGINT NOT NULL REFERENCES films(id),
-    genre_id INT NOT NULL REFERENCES genres(id),
+    film_id BIGINT NOT NULL REFERENCES films(id) ON DELETE CASCADE,
+    genre_id INT NOT NULL REFERENCES genres(id) ON DELETE CASCADE,
     PRIMARY KEY (film_id, genre_id)
 );
 
@@ -38,15 +38,15 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Друзья (Спринт 12)
 CREATE TABLE IF NOT EXISTS user_friends (
-    user_id BIGINT NOT NULL REFERENCES users(id),
-    friend_id BIGINT NOT NULL REFERENCES users(id),
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    friend_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, friend_id)
 );
 
 -- Лайки (Спринт 12)
 CREATE TABLE IF NOT EXISTS film_likes (
-    film_id BIGINT NOT NULL REFERENCES films(id),
-    user_liked_id BIGINT NOT NULL REFERENCES users(id),
+    film_id BIGINT NOT NULL REFERENCES films(id) ON DELETE CASCADE,
+    user_liked_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     PRIMARY KEY (film_id, user_liked_id)
 );
 

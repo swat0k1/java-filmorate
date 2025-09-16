@@ -223,9 +223,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
     @Override
     public Film deleteFilm(int id) {
         Film film = getFilmById(id);
-        genreDbStorage.deleteGenres(id);
-        if (!film.getLikes().isEmpty()) likeDbStorage.deleteAllFilmLikes(id);
-        update(DELETE, id);
+        delete(DELETE, id);
         return film;
     }
 
