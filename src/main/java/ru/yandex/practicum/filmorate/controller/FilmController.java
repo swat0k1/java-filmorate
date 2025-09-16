@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
@@ -82,6 +84,13 @@ public class FilmController {
     @DeleteMapping("/{id}")
     public Film delete(@PathVariable("id") int id) {
         return filmService.delete(id);
+    }
+
+    @GetMapping("/common")
+    public ResponseEntity<Collection<Film>> getCommonFilms(@RequestParam(value = "userId") int userId,
+                                                           @RequestParam(value = "friendId") int friendId) {
+        Collection<Film> commonFilms = filmService.getCommonFilms(userId, friendId);
+        return new ResponseEntity<>(commonFilms, HttpStatus.OK);
     }
 
 }
