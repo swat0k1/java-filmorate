@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -23,8 +22,7 @@ public class UserService {
 
     private final UserStorage userStorage;
     private FriendDbStorage friendDbStorage;
-    // !! Внедрение зависимости для работы метода Collection<Film> getRecommendations(int id)
-    FilmDbStorage filmDbStorage;
+    private FilmDbStorage filmDbStorage;
 
     public User createUser(User user) {
         return userStorage.createUser(user);
