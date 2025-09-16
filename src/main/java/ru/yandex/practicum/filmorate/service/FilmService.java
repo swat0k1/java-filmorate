@@ -53,7 +53,7 @@ public class FilmService {
         if (sort.equals("year") || sort.equals("likes")) {
             films = filmStorage.getFilmsByDirector(id, sort);
         } else {
-            throw new InternalServerException("Метод" + sort + "сортировки не поддерживается");
+            films = filmStorage.getFilmsByDirector(id, "year");
         }
 
         return films;
