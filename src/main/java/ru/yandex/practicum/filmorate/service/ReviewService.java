@@ -5,10 +5,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.UserFeed;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.Operation;
 import ru.yandex.practicum.filmorate.storage.dbStorage.ReviewDbStorage;
+import ru.yandex.practicum.filmorate.storage.dbStorage.UserFeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
@@ -24,17 +29,17 @@ public class ReviewService {
     private final ReviewDbStorage reviewStorage;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
-    //TODO: возможно тут нужно будет добавить что то связанное с лентой событий
+    private final UserFeedDbStorage userFeedDbStorage;
 
+    @Transactional
     public Review addReview(Review review) {
-
-        checkUserFilm(review.getUserId(), review.getFilmId());
-
+        int userId = review.getUserId();
+        int filmId = review.getFilmId();
+        checkUserFilm(userId, filmId);
         review.setUseful(0);
         Review reviewDb = reviewStorage.addReview(review);
-
-        //TODO: место для реализации ленты событий
-
+        userFeedDbStorage.save(new UserFeed(userId, EventType.REVIEW,
+                Operation.ADD, reviewDb.getReviewId()));
         return reviewDb;
     }
 
@@ -50,35 +55,31 @@ public class ReviewService {
                 .toList();
     }
 
+    @Transactional
     public Review updateReview(Review review) {
-
         int newReviewId = review.getReviewId();
+        int filmId = review.getFilmId();
+        int userId = review.getUserId();
         Review reviewDb = getReview(newReviewId);
-
-        checkUserFilm(review.getUserId(), review.getFilmId());
+        checkUserFilm(userId, filmId);
 
         reviewDb.setContent(review.getContent());
         reviewDb.setIsPositive(review.getIsPositive());
         reviewDb.setUseful(reviewStorage.getAmountOfLikes(newReviewId) - reviewStorage.getAmountOfDislikes(newReviewId));
-
         Review updatedReview = reviewStorage.updateReview(reviewDb);
-
-        //TODO: место для реализации ленты событий
-
+        userFeedDbStorage.save(new UserFeed(userId, EventType.REVIEW,
+                Operation.UPDATE, newReviewId));
         return updatedReview;
 
     }
 
+    @Transactional
     public void deleteReviewById(int reviewId) {
-
-        Review reviewDb = reviewStorage.getReview(reviewId);
-
+        Review review = reviewStorage.getReview(reviewId);
         reviewStorage.deleteAllLikesByReviewId(reviewId);
-
-        //TODO: место для реализации ленты событий
-
+        userFeedDbStorage.save(new UserFeed(review.getUserId(), EventType.REVIEW,
+                Operation.REMOVE, reviewId));
         reviewStorage.deleteReviewById(reviewId);
-
     }
 
     public Review addUsersLike(int reviewId, int userId) {
@@ -119,7 +120,6 @@ public class ReviewService {
 
         if (reviewStorage.hasUsersLike(reviewId, userId)) {
             reviewStorage.deleteUsersLike(reviewId, userId);
-            //TODO: место для реализации ленты событий
         }
         return calculateUseful(reviewId);
 
