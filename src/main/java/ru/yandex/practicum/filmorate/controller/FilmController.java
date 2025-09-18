@@ -84,4 +84,11 @@ public class FilmController {
         return filmService.delete(id);
     }
 
+    @GetMapping("/common")
+    public ResponseEntity<Collection<Film>> getCommonFilms(@RequestParam(value = "userId") int userId,
+                                                           @RequestParam(value = "friendId") int friendId) {
+        Collection<Film> commonFilms = filmService.getCommonFilms(userId, friendId);
+        return new ResponseEntity<>(commonFilms, HttpStatus.OK);
+    }
+
 }

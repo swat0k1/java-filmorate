@@ -83,25 +83,33 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
 
 
     private static final String GET_FILMS_DIRECTOR_YEAR = "SELECT film_.id " +
-                                                            "FROM films AS film_ " +
-                                                            "INNER JOIN film_director AS film_dir ON film_dir.film_id = film_.id " +
-                                                            "WHERE film_dir.director_id = ? " +
-                                                            "ORDER BY EXTRACT(YEAR FROM film_.release_date)";
+            "FROM films AS film_ " +
+            "INNER JOIN film_director AS film_dir ON film_dir.film_id = film_.id " +
+            "WHERE film_dir.director_id = ? " +
+            "ORDER BY EXTRACT(YEAR FROM film_.release_date)";
 
     private static final String GET_FILMS_DIRECTOR_LIKES = "SELECT f.id " +
-                                                            "FROM films f " +
-                                                            "JOIN film_director fd ON f.id = fd.film_id " +
-                                                            "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
-                                                            "WHERE fd.director_id = ? " +
-                                                            "GROUP BY f.id " +
-                                                            "ORDER BY COUNT(fl.film_id) DESC";
+            "FROM films f " +
+            "JOIN film_director fd ON f.id = fd.film_id " +
+            "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
+            "WHERE fd.director_id = ? " +
+            "GROUP BY f.id " +
+            "ORDER BY COUNT(fl.film_id) DESC";
 
     private static final String GET_ALL_DIRECTOR_ID = "SELECT id " +
-                                                        "FROM director";
+            "FROM director";
 
     private static final String ADD_FILM_DIRECTOR = "INSERT " +
-                                                    "INTO film_director (film_id, director_id) " +
-                                                    "VALUES (?, ?)";
+            "INTO film_director (film_id, director_id) " +
+            "VALUES (?, ?)";
+
+    private static final String GET_COMMON_FILMS = "SELECT fl1.film_id " +
+            "FROM film_likes fl1 " +
+            "JOIN film_likes fl2 " +
+            "ON fl1.film_id = fl2.film_id " +
+            "WHERE fl1.user_liked_id = ? AND fl2.user_liked_id = ?" +
+            "GROUP BY fl1.film_id " +
+            "ORDER BY (SELECT COUNT(user_liked_id) FROM film_likes WHERE film_id = fl1.film_id) DESC";
 
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper, MpaDbStorage mpaDbStorage,
                          GenreDbStorage genreDbStorage, LikeDbStorage likeDbStorage, DirectorDbStorage directorDbStorage) {
@@ -249,5 +257,18 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
             film.setLikes(likes.getOrDefault(film.getId(), new ArrayList<>()));
         }
         return films;
+    }
+
+    public Collection<Film> getCommonFilms(int userId, int friendId) {
+        List<Integer> commonFilmsId = jdbc.queryForList(GET_COMMON_FILMS, Integer.class, userId, friendId);
+        if (commonFilmsId.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Film> commonFilms = new ArrayList<>();
+        for (Integer filmId : commonFilmsId) {
+            commonFilms.add(getFilmById(filmId));
+        }
+
+        return commonFilms;
     }
 }
