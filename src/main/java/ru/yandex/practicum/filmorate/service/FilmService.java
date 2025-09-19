@@ -96,5 +96,8 @@ public class FilmService {
         return Stream.concat(
                 filmsSortedByTitle,
                 filmsSortedByDirector).toList();
+
+    public Collection<Film> getCommonFilms(int userId, int friendId) {
+        return filmStorage.getCommonFilms(userId, friendId);
     }
 }

@@ -92,4 +92,11 @@ public class FilmController {
         Collection<Film> foundFilmsSortedByPopularity = filmService.getFoundFilms(textForSearch, by);
         return new ResponseEntity<>(foundFilmsSortedByPopularity, HttpStatus.OK);
     }
+
+    @GetMapping("/common")
+    public ResponseEntity<Collection<Film>> getCommonFilms(@RequestParam(value = "userId") int userId,
+                                                           @RequestParam(value = "friendId") int friendId) {
+        Collection<Film> commonFilms = filmService.getCommonFilms(userId, friendId);
+        return new ResponseEntity<>(commonFilms, HttpStatus.OK);
+    }
 }
