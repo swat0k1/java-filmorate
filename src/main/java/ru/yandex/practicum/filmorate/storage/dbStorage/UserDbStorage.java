@@ -61,6 +61,9 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
 
     @Override
     public User createUser(User user) {
+        if (user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
         int id = insert(
                 INSERT,
                 user.getEmail(),

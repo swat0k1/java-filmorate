@@ -19,12 +19,16 @@ public class DirectorDbStorage extends BaseRepository<Director> {
             "FROM director " +
             "WHERE id = ?";
 
+    private static final String GET_FILM_DIRECTORS_COUNT = "SELECT COUNT(director_id) " +
+            "FROM film_director " +
+            "WHERE film_id = ?";
+
     private static final String GET_ALL_DIRECTORS = "SELECT * " +
             "FROM director";
 
     private static final String ADD_DIRECTOR = "INSERT " +
-            "INTO director (id, director_name) " +
-            "VALUES (?, ?)";
+            "INTO director (director_name) " +
+            "VALUES (?)";
 
     private static final String UPDATE_DIRECTOR = "UPDATE director " +
             "SET director_name = ? " +
@@ -59,6 +63,10 @@ public class DirectorDbStorage extends BaseRepository<Director> {
 
     }
 
+    public int countFilmsDirectors(int filmId) {
+        return jdbc.queryForObject(GET_FILM_DIRECTORS_COUNT, Integer.class, filmId);
+    }
+
     public List<Director> getAllDirectors() {
         try {
             return findMany(GET_ALL_DIRECTORS);
@@ -75,7 +83,6 @@ public class DirectorDbStorage extends BaseRepository<Director> {
             }
 
             int id = insert(ADD_DIRECTOR,
-                    director.getId(),
                     director.getName());
 
             director.setId(id);

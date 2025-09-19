@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.dbStorage;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.FindingException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.ResultSet;
@@ -26,6 +27,10 @@ public class LikeDbStorage extends BaseRepository<Film> {
             "FROM film_likes " +
             "WHERE film_id = ? AND user_liked_id = ?";
 
+    private static final String FIND_LIKE = "SELECT COUNT(user_liked_id) " +
+            "FROM film_likes " +
+            "WHERE film_id = ? AND user_liked_id = ?";
+
     private static final String DELETE_ALL_FILM_LIKES = "DELETE " +
             "FROM film_likes " +
             "WHERE film_id = ?";
@@ -46,7 +51,15 @@ public class LikeDbStorage extends BaseRepository<Film> {
     }
 
     public void deleteLike(int filmId, int userId) {
+        Integer userLikeId = jdbc.queryForObject(FIND_LIKE, Integer.class, filmId, userId);
+        if (userLikeId == 0) {
+            throw new FindingException("Лайк не найден");
+        }
         update(DELETE, filmId, userId);
+    }
+
+    public void findLike(int filmId, int userId) {
+        findOne(FIND_LIKE, filmId, userId);
     }
 
     public void deleteAllFilmLikes(int filmId) {

@@ -48,12 +48,22 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
     private static final String FIND_TOP_FILMS = "SELECT * " +
             "FROM films f " +
             "LEFT JOIN rating_mpa m " +
-            "ON f.id = m.mpa_id " +
+            "ON f.rating_id = m.mpa_id " +
             "LEFT JOIN (" +
             "SELECT film_id, COUNT(film_id) AS likes " +
             "FROM film_likes " +
             "GROUP BY film_id) fl " +
             "ON f.id = fl.film_id ORDER BY likes DESC LIMIT ?";
+
+    private static final String FIND_TOP_FILMS_ALL = "SELECT * " +
+            "FROM films f " +
+            "LEFT JOIN rating_mpa m " +
+            "ON f.rating_id = m.mpa_id " +
+            "LEFT JOIN (" +
+            "SELECT film_id, COUNT(film_id) AS likes " +
+            "FROM film_likes " +
+            "GROUP BY film_id) fl " +
+            "ON f.id = fl.film_id ORDER BY likes DESC";
 
     private static final String JOIN_TABLES =
             "SELECT * " +
@@ -125,6 +135,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
             "GROUP BY fl1.film_id " +
             "ORDER BY (SELECT COUNT(user_liked_id) FROM film_likes WHERE film_id = fl1.film_id) DESC";
 
+
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper, MpaDbStorage mpaDbStorage,
                          GenreDbStorage genreDbStorage, LikeDbStorage likeDbStorage, DirectorDbStorage directorDbStorage) {
         super(jdbc, mapper, Film.class);
@@ -175,6 +186,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
     @Override
     public Film updateFilm(Film film) {
         mpaDbStorage.findById(film.getMpa().getId());
+        getFilmById(film.getId());
         update(
                 UPDATE,
                 film.getName(),
@@ -211,6 +223,19 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
             }
 
             jdbc.batchUpdate(ADD_FILM_DIRECTOR, batchArgs);
+        }
+
+        if (!film.getGenres().isEmpty()) {
+            if (genreDbStorage.countFilmsGenres(film.getId()) != 0) {
+                genreDbStorage.deleteGenres(film.getId());
+            }
+            genreDbStorage.setFilmGenres(film.getId(), film.getGenres());
+        } else if (genreDbStorage.countFilmsGenres(film.getId()) != 0) {
+            genreDbStorage.deleteGenres(film.getId());
+        }
+
+        if (film.getGenres().isEmpty() && !directorDbStorage.getDirectorOfFilm(film.getId()).isEmpty()) {
+
         }
 
         return getFilmById(film.getId());
@@ -269,7 +294,10 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
 
     @Override
     public Collection<Film> getTopFilms(Integer count, Integer genreId, Integer year) {
-        if (genreId == null && year == null) {
+
+        if (count == null && genreId == null && year == null) {
+            return getFilmsForTop(FIND_TOP_FILMS_ALL);
+        } else if (genreId == null && year == null) {
             return getFilmsForTop(FIND_TOP_FILMS, count);
         } else if (genreId != null && year != null) {
             return getFilmsForTop(FIND_TOP_FILMS_WITH_GENRE_AND_YEAR, genreId, year);

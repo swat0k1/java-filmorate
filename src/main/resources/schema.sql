@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS review_likes (
 
 -- Функциональность Режиссеры (Спринт 13)
 CREATE TABLE IF NOT EXISTS director (
-    id BIGINT PRIMARY KEY,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     director_name VARCHAR
 );
 

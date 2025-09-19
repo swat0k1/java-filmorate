@@ -43,6 +43,10 @@ public class GenreDbStorage extends BaseRepository<Genre> {
             "FROM film_genres " +
             "WHERE film_id = ?";
 
+    private static final String COUNT_FILMS_GENRES = "SELECT COUNT(genre_id) " +
+            "FROM film_genres " +
+            "WHERE film_id = ?";
+
     public GenreDbStorage(JdbcTemplate jdbc, RowMapper<Genre> mapper) {
         super(jdbc, mapper, Genre.class);
     }
@@ -54,7 +58,7 @@ public class GenreDbStorage extends BaseRepository<Genre> {
 
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
-                ps.setLong(1, filmId);
+                ps.setInt(1, filmId);
                 ps.setInt(2, genresId.get(i));
             }
 
@@ -105,5 +109,9 @@ public class GenreDbStorage extends BaseRepository<Genre> {
 
     public void deleteGenres(int filmId) {
         update(DELETE_ALL_GENRES_FILM, filmId);
+    }
+
+    public int countFilmsGenres(int filmId) {
+        return jdbc.queryForObject(COUNT_FILMS_GENRES, Integer.class, filmId);
     }
 }

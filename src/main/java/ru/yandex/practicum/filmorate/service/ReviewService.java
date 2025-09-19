@@ -55,6 +55,11 @@ public class ReviewService {
                 .toList();
     }
 
+    public List<Review> getReviews() {
+        return reviewStorage.getAllReviews().stream()
+                .toList();
+    }
+
     @Transactional
     public Review updateReview(Review review) {
         int newReviewId = review.getReviewId();
