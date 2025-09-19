@@ -117,6 +117,14 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
     private static final String INSERT_INTO_DIRECTORS =
             "INSERT INTO directors(id, director_name) VALUES(?, ?)";
 
+    private static final String GET_COMMON_FILMS = "SELECT fl1.film_id " +
+            "FROM film_likes fl1 " +
+            "JOIN film_likes fl2 " +
+            "ON fl1.film_id = fl2.film_id " +
+            "WHERE fl1.user_liked_id = ? AND fl2.user_liked_id = ?" +
+            "GROUP BY fl1.film_id " +
+            "ORDER BY (SELECT COUNT(user_liked_id) FROM film_likes WHERE film_id = fl1.film_id) DESC";
+
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper, MpaDbStorage mpaDbStorage,
                          GenreDbStorage genreDbStorage, LikeDbStorage likeDbStorage, DirectorDbStorage directorDbStorage) {
         super(jdbc, mapper, Film.class);
@@ -315,5 +323,17 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
 
             jdbc.batchUpdate(INSERT_INTO_DIRECTORS, batchArgsForInsertIntoDirectors);
         }
+      
+    public Collection<Film> getCommonFilms(int userId, int friendId) {
+        List<Integer> commonFilmsId = jdbc.queryForList(GET_COMMON_FILMS, Integer.class, userId, friendId);
+        if (commonFilmsId.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<Film> commonFilms = new ArrayList<>();
+        for (Integer filmId : commonFilmsId) {
+            commonFilms.add(getFilmById(filmId));
+        }
+
+        return commonFilms;
     }
 }
