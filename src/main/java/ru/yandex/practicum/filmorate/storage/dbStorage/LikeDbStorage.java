@@ -15,9 +15,11 @@ import java.util.Map;
 @Repository
 public class LikeDbStorage extends BaseRepository<Film> {
 
-    private static final String INSERT = "INSERT " +
-            "INTO film_likes (film_id, user_liked_id) " +
-            "VALUES (?, ?)";
+    private static final String INSERT = """
+            MERGE INTO film_likes
+            KEY (film_id, user_liked_id)
+            VALUES (?, ?);
+            """;
 
     private static final String FIND_FILMS_LIKE = "SELECT user_liked_id " +
             "FROM film_likes " +

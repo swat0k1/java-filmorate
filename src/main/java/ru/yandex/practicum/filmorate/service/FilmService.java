@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.storage.dbStorage.LikeDbStorage;
 import ru.yandex.practicum.filmorate.storage.dbStorage.UserFeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -86,31 +87,7 @@ public class FilmService {
     }
 
     public Collection<Film> getFoundFilms(String textForSearch, List<String> by) {
-
-        List<Film> films = getAllFilms().stream().toList();
-
-        Stream<Film> filmsSortedByDirector =
-                films.stream()
-                        .filter(film -> film.getDirectors().stream()
-                                .anyMatch(director -> director.getName().contains(textForSearch)))
-                        .sorted(Comparator.comparingInt(film -> film.getLikes().size()));
-
-        Stream<Film> filmsSortedByTitle = getAllFilms().stream()
-                .filter(film -> film.getName().contains(textForSearch));
-
-        if (by.size() == 1) {
-            switch (by.getFirst()) {
-                case "director" -> {
-                    return filmsSortedByDirector.toList();
-                }
-
-                case "title" -> {
-                    return filmsSortedByTitle.toList();
-                }
-            }
-        }
-
-        return Stream.concat(filmsSortedByTitle, filmsSortedByDirector).toList();
+        return filmStorage.searchFilms(textForSearch, by);
     }
 
     public Collection<Film> getCommonFilms(int userId, int friendId) {

@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.exception.FindingException;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.model.Review;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -26,8 +27,20 @@ public class ReviewDbStorage extends BaseRepository<Review> {
             "FROM reviews " +
             "WHERE film_id = ?";
 
-    private static final String GET_ALL = "SELECT * " +
-            "FROM reviews";
+    private static final String GET_ALL_ORDERED_LIMIT = """
+        SELECT *
+        FROM reviews
+        ORDER BY useful DESC, review_id ASC
+        LIMIT ?
+        """;
+
+    private static final String GET_BY_FILM_ORDERED_LIMIT = """
+        SELECT *
+        FROM reviews
+        WHERE film_id = ?
+        ORDER BY useful DESC, review_id ASC
+        LIMIT ?
+        """;
 
     private static final String UPDATE_REVIEW = "UPDATE reviews " +
             "SET content = ?, is_positive = ?, useful = ? " +
@@ -74,14 +87,12 @@ public class ReviewDbStorage extends BaseRepository<Review> {
 
     }
 
-    public List<Review> getAllReviews() {
+    public List<Review> findAllOrderedLimited(int limit) {
+        return new ArrayList<>(findMany(GET_ALL_ORDERED_LIMIT, limit));
+    }
 
-        try {
-            return findMany(GET_ALL);
-        } catch (InternalServerException e) {
-            throw new InternalServerException("Ошибка получения отзывов.");
-        }
-
+    public List<Review> findByFilmOrderedLimited(int filmId, int limit) {
+        return new ArrayList<>(findMany(GET_BY_FILM_ORDERED_LIMIT, filmId, limit));
     }
 
     public List<Review> getReviewsByFilmId(int filmId) {

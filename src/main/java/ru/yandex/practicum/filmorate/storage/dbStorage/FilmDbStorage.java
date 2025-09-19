@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.dbStorage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -14,8 +15,8 @@ import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.stream.Collectors;
 
+@Primary
 @Repository
 @Slf4j
 public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
@@ -269,15 +270,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
     @Override
     public Collection<Film> getAllFilms() {
         Collection<Film> films = findMany(FIND_ALL);
-        Map<Integer, Set<Genre>> genres = genreDbStorage.findAllFilmsGenres();
-        Map<Integer, Collection<Integer>> likes = likeDbStorage.findAllFilmsLikes();
-        Map<Integer, Set<Director>> directors = findAllFilmsDirectors();
-        for (Film film : films) {
-            film.setGenres(genres.getOrDefault(film.getId(), new LinkedHashSet<>()));
-            film.setLikes(likes.getOrDefault(film.getId(), new ArrayList<>()));
-            film.setDirectors(directors.getOrDefault(film.getId(), new LinkedHashSet<>()));
-        }
-        return films;
+        return hydrateFilms(films);
     }
 
     @Override
@@ -389,5 +382,64 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
         }
 
         return commonFilms;
+    }
+
+    public Collection<Film> searchFilms(String textForSearch, List<String> by) {
+        if (textForSearch == null || textForSearch.isBlank()) return List.of();
+
+        boolean byTitle = by != null && by.stream().anyMatch("title"::equalsIgnoreCase);
+        boolean byDirector = by != null && by.stream().anyMatch("director"::equalsIgnoreCase);
+        if (!byTitle && !byDirector) return List.of();
+
+        String pattern = "%" + textForSearch.toLowerCase() + "%";
+
+        // В обеих ветках выбираем один и тот же явный набор колонок (для FilmRowMapper)
+        StringBuilder sql = new StringBuilder();
+        List<Object> params = new ArrayList<>();
+        boolean first = true;
+
+        if (byTitle) {
+            sql.append("""
+                        SELECT f.id, f.name, f.description, f.release_date, f.duration,
+                               m.mpa_id, m.mpa_name
+                        FROM films f
+                        JOIN rating_mpa m ON f.rating_id = m.mpa_id
+                        WHERE LOWER(f.name) LIKE ?
+                    """);
+            params.add(pattern);
+            first = false;
+        }
+        if (byDirector) {
+            if (!first) sql.append(" UNION ");
+            sql.append("""
+                        SELECT f.id, f.name, f.description, f.release_date, f.duration,
+                               m.mpa_id, m.mpa_name
+                        FROM films f
+                        JOIN rating_mpa m ON f.rating_id = m.mpa_id
+                        JOIN film_director fd ON fd.film_id = f.id
+                        JOIN director d       ON d.id       = fd.director_id
+                        WHERE LOWER(d.director_name) LIKE ?
+                    """);
+            params.add(pattern);
+        }
+
+        String finalSql = "(" + sql + ") ORDER BY id DESC";
+
+        List<Film> films = search(finalSql, params.toArray());
+        if (films.isEmpty()) return films;
+        return hydrateFilms(films);
+    }
+
+    private Collection<Film> hydrateFilms(Collection<Film> films) {
+        Map<Integer, Set<Genre>> genres = genreDbStorage.findAllFilmsGenres();
+        Map<Integer, Collection<Integer>> likes = likeDbStorage.findAllFilmsLikes();
+        Map<Integer, Set<Director>> directors = findAllFilmsDirectors();
+
+        for (Film film : films) {
+            film.setGenres(genres.getOrDefault(film.getId(), new LinkedHashSet<>()));
+            film.setLikes(likes.getOrDefault(film.getId(), new ArrayList<>()));
+            film.setDirectors(directors.getOrDefault(film.getId(), new LinkedHashSet<>()));
+        }
+        return films;
     }
 }

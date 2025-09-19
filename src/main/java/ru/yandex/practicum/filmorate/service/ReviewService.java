@@ -55,9 +55,10 @@ public class ReviewService {
                 .toList();
     }
 
-    public List<Review> getReviews() {
-        return reviewStorage.getAllReviews().stream()
-                .toList();
+    public List<Review> getReviews(Integer filmId, int count) {
+        return (filmId == null)
+                ? reviewStorage.findAllOrderedLimited(count)
+                : reviewStorage.findByFilmOrderedLimited(filmId, count);
     }
 
     @Transactional
@@ -78,27 +79,28 @@ public class ReviewService {
 
     }
 
-    @Transactional
     public void deleteReviewById(int reviewId) {
         Review review = reviewStorage.getReview(reviewId);
         reviewStorage.deleteAllLikesByReviewId(reviewId);
-        userFeedDbStorage.save(new UserFeed(review.getUserId(), EventType.REVIEW,
-                Operation.REMOVE, reviewId));
         reviewStorage.deleteReviewById(reviewId);
     }
 
+    @Transactional
     public Review addUsersLike(int reviewId, int userId) {
 
         checkReviewUser(reviewId, userId);
-
         if (reviewStorage.hasUsersLike(reviewId, userId)) {
             return getReview(reviewId);
         } else if (reviewStorage.hasUsersDislike(reviewId, userId)) {
+            userFeedDbStorage.save(new UserFeed(userId, EventType.LIKE,
+                    Operation.REMOVE, reviewId));
             reviewStorage.deleteUsersDislike(reviewId, userId);
             return getReview(reviewId);
         }
 
         reviewStorage.addUsersLike(reviewId, userId);
+        userFeedDbStorage.save(new UserFeed(userId, EventType.LIKE,
+                Operation.ADD, reviewId));
 
         return calculateUseful(reviewId);
     }
@@ -106,7 +108,6 @@ public class ReviewService {
     public Review addUsersDislike(int reviewId, int userId) {
 
         checkReviewUser(reviewId, userId);
-
         if (reviewStorage.hasUsersDislike(reviewId, userId)) {
             return getReview(reviewId);
         } else if (reviewStorage.hasUsersLike(reviewId, userId)) {
@@ -114,6 +115,8 @@ public class ReviewService {
         }
 
         reviewStorage.addUsersDislike(reviewId, userId);
+        userFeedDbStorage.save(new UserFeed(userId, EventType.LIKE,
+                Operation.REMOVE, reviewId));
 
         return calculateUseful(reviewId);
 

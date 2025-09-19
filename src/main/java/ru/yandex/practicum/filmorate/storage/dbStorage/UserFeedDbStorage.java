@@ -17,7 +17,9 @@ import java.util.Map;
 public class UserFeedDbStorage extends BaseRepository<UserFeed> {
     private static final String GET_ALL_EVENTS_FOR_USER = """
             SELECT user_id, timestamp, event_type, operation, event_id, entity_id
-            FROM user_feed WHERE user_id = ?
+            FROM user_feed
+            WHERE user_id = ?
+               OR user_id IN (SELECT friend_id FROM user_friends WHERE user_id = ?)
             """;
 
     public UserFeedDbStorage(JdbcTemplate jdbc, RowMapper<UserFeed> mapper) {
@@ -46,7 +48,7 @@ public class UserFeedDbStorage extends BaseRepository<UserFeed> {
 
     public List<UserFeed> getUserFeed(int userId) {
         try {
-            return findMany(GET_ALL_EVENTS_FOR_USER, userId);
+            return findMany(GET_ALL_EVENTS_FOR_USER, userId, userId);
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка получения ленты.");
         }

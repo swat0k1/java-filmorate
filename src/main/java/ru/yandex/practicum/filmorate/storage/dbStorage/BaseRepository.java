@@ -83,4 +83,8 @@ public class BaseRepository<T> {
             throw new InternalServerException("Ошибка удаления данных");
         }
     }
+
+    protected List<T> search(String query, Object... params) {
+        return jdbc.query(query, rowMapper, params);
+    }
 }
