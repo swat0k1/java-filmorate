@@ -16,35 +16,33 @@ import java.util.List;
 public class DirectorDbStorage extends BaseRepository<Director> {
 
     private static final String GET_DIRECTOR = "SELECT * " +
-                                                "FROM director " +
-                                                "WHERE id = ?";
+            "FROM director " +
+            "WHERE id = ?";
 
     private static final String GET_ALL_DIRECTORS = "SELECT * " +
-                                                    "FROM director";
+            "FROM director";
 
     private static final String ADD_DIRECTOR = "INSERT " +
-                                                "INTO director (id, director_name) " +
-                                                "VALUES (?, ?)";
+            "INTO director (id, director_name) " +
+            "VALUES (?, ?)";
 
     private static final String UPDATE_DIRECTOR = "UPDATE director " +
-                                                    "SET director_name = ? " +
-                                                    "WHERE id = ?";
+            "SET director_name = ? " +
+            "WHERE id = ?";
 
     private static final String DELETE_ALL_DIRECTORS = "DELETE " +
-                                                        "FROM director";
+            "FROM director";
 
     private static final String DELETE_DIRECTOR_BY_ID = "DELETE " +
-                                                        "FROM director " +
-                                                        "WHERE id = ?";
+            "FROM director " +
+            "WHERE id = ?";
 
     private static final String GET_LAST_ID = "SELECT MAX(id) " +
-                                                "FROM director";
+            "FROM director";
 
     private static final String GET_FILMS_DIRECTOR = "SELECT id, director_name " +
-                                                    "FROM director d, film_director fd " +
-                                                    "WHERE d.id = fd.director_id AND fd.film_id = ?";
-
-
+            "FROM director d, film_director fd " +
+            "WHERE d.id = fd.director_id AND fd.film_id = ?";
 
     public DirectorDbStorage(JdbcTemplate jdbc, RowMapper<Director> mapper) {
         super(jdbc, mapper, Director.class);
@@ -147,7 +145,5 @@ public class DirectorDbStorage extends BaseRepository<Director> {
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка получения режиссера фильма.");
         }
-
     }
-
 }
