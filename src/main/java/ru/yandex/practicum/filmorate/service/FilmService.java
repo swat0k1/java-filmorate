@@ -73,10 +73,11 @@ public class FilmService {
 
         List<Film> films = getAllFilms().stream().toList();
 
-        Stream<Film> filmsSortedByDirector = films.stream()
-                .filter(film -> film.getDirectors().stream()
-                        .anyMatch(director -> director.getName().contains(textForSearch)))
-                .sorted(Comparator.comparingInt(film -> film.getLikes().size()));
+        Stream<Film> filmsSortedByDirector =
+                films.stream()
+                        .filter(film -> film.getDirectors().stream()
+                                .anyMatch(director -> director.getName().contains(textForSearch)))
+                        .sorted(Comparator.comparingInt(film -> film.getLikes().size()));
 
         Stream<Film> filmsSortedByTitle = getAllFilms().stream()
                 .filter(film -> film.getName().contains(textForSearch));
@@ -93,8 +94,6 @@ public class FilmService {
             }
         }
 
-        return Stream.concat(
-                filmsSortedByTitle,
-                filmsSortedByDirector).toList();
+        return Stream.concat(filmsSortedByTitle, filmsSortedByDirector).toList();
     }
 }
