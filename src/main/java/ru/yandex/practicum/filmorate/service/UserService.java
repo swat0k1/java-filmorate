@@ -3,11 +3,16 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserFeed;
+import ru.yandex.practicum.filmorate.model.enums.EventType;
+import ru.yandex.practicum.filmorate.model.enums.Operation;
 import ru.yandex.practicum.filmorate.storage.dbStorage.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.dbStorage.FriendDbStorage;
+import ru.yandex.practicum.filmorate.storage.dbStorage.UserFeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.UserStorage;
 
 import java.util.ArrayList;
@@ -23,6 +28,7 @@ public class UserService {
     private final UserStorage userStorage;
     private FriendDbStorage friendDbStorage;
     private FilmDbStorage filmDbStorage;
+    private UserFeedDbStorage userFeedDbStorage;
 
     public User createUser(User user) {
         return userStorage.createUser(user);
@@ -36,28 +42,30 @@ public class UserService {
         return userStorage.getAllUsers();
     }
 
+    @Transactional
     public User addFriend(int userId, int friendId) {
-
         if (userId == friendId) {
             throw new ValidationException("Пользователь не может добавить сам себя в друзья!");
         }
-
         friendDbStorage.addFriend(userId, friendId);
+        userFeedDbStorage.save(new UserFeed(userId, EventType.FRIEND,
+                Operation.ADD, friendId));
         return userStorage.getUserById(userId);
 
     }
 
+    @Transactional
     public User removeFriend(int userId, int friendId) {
-
         if (userId == friendId) {
             throw new ValidationException("id пользователей не должны совпадать!");
         }
-
         User user = userStorage.getUserById(userId);
         User friend = userStorage.getUserById(friendId);
         if (user.getFriends().contains(friend.getId())) {
             friendDbStorage.deleteFriend(userId, friendId);
         }
+        userFeedDbStorage.save(new UserFeed(userId, EventType.FRIEND,
+                Operation.REMOVE, friendId));
         return userStorage.getUserById(userId);
 
     }
