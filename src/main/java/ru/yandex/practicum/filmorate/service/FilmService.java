@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.filmorate.exception.FindingException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.UserFeed;
 import ru.yandex.practicum.filmorate.model.enums.EventType;
@@ -66,6 +67,10 @@ public class FilmService {
             films = filmStorage.getFilmsByDirector(id, sort);
         } else {
             films = filmStorage.getFilmsByDirector(id, "year");
+        }
+
+        if (films.isEmpty()) {
+            throw new FindingException("Фильмы не найдены");
         }
 
         return films;

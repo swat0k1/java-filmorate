@@ -77,7 +77,7 @@ public class BaseRepository<T> {
         }
     }
 
-    protected void delete(String query, long id) {
+    protected void delete(String query, int id) {
         int rowsDeleted = jdbc.update(query, id);
         if (rowsDeleted == 0) {
             throw new InternalServerException("Ошибка удаления данных");

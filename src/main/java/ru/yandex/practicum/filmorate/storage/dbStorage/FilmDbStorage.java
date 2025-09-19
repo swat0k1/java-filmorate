@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @Slf4j
@@ -115,6 +116,10 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
     private static final String ADD_FILM_DIRECTOR = "INSERT " +
             "INTO film_director (film_id, director_id) " +
             "VALUES (?, ?)";
+
+    private static final String DELETE_FILM_DIRECTORS = "DELETE " +
+            "FROM film_director " +
+            "WHERE film_id = ?";
 
     private static final String FIND_ALL_FILMS_DIRECTORS = "SELECT film_id, director_id, director_name " +
             "FROM film_director fd, " +
@@ -235,8 +240,28 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
         }
 
         if (film.getGenres().isEmpty() && !directorDbStorage.getDirectorOfFilm(film.getId()).isEmpty()) {
-
+            delete(DELETE_FILM_DIRECTORS, film.getId());
         }
+
+        if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
+
+            Set<Integer> directorsId = new HashSet<>(jdbc.queryForList(GET_ALL_DIRECTOR_ID, Integer.class));
+            Collection<Director> directors = directorDbStorage.getAllDirectors();
+
+            checkDirectorsAndInsertIfNotExists(directors.stream().toList());
+
+            List<Object[]> batchArgs = new ArrayList<>();
+
+            for (Director director : film.getDirectors()) {
+                if (directorsId.contains(director.getId())) {
+                    batchArgs.add(new Object[]{film.getId(), director.getId()});
+                }
+            }
+
+            jdbc.batchUpdate(ADD_FILM_DIRECTOR, batchArgs);
+        }
+
+        film.setDirectors(new HashSet<>(directorDbStorage.getDirectorOfFilm(film.getId())));
 
         return getFilmById(film.getId());
     }
