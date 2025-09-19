@@ -323,7 +323,8 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
 
             jdbc.batchUpdate(INSERT_INTO_DIRECTORS, batchArgsForInsertIntoDirectors);
         }
-      
+    }
+
     public Collection<Film> getCommonFilms(int userId, int friendId) {
         List<Integer> commonFilmsId = jdbc.queryForList(GET_COMMON_FILMS, Integer.class, userId, friendId);
         if (commonFilmsId.isEmpty()) {
