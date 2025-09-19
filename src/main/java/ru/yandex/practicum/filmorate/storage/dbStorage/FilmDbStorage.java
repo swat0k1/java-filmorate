@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.dbStorage;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -10,10 +11,12 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 
+import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.*;
 
 @Repository
+@Slf4j
 public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
 
     private MpaDbStorage mpaDbStorage;
@@ -83,25 +86,36 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
 
 
     private static final String GET_FILMS_DIRECTOR_YEAR = "SELECT film_.id " +
-                                                            "FROM films AS film_ " +
-                                                            "INNER JOIN film_director AS film_dir ON film_dir.film_id = film_.id " +
-                                                            "WHERE film_dir.director_id = ? " +
-                                                            "ORDER BY EXTRACT(YEAR FROM film_.release_date)";
+            "FROM films AS film_ " +
+            "INNER JOIN film_director AS film_dir ON film_dir.film_id = film_.id " +
+            "WHERE film_dir.director_id = ? " +
+            "ORDER BY EXTRACT(YEAR FROM film_.release_date)";
 
     private static final String GET_FILMS_DIRECTOR_LIKES = "SELECT f.id " +
-                                                            "FROM films f " +
-                                                            "JOIN film_director fd ON f.id = fd.film_id " +
-                                                            "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
-                                                            "WHERE fd.director_id = ? " +
-                                                            "GROUP BY f.id " +
-                                                            "ORDER BY COUNT(fl.film_id) DESC";
+            "FROM films f " +
+            "JOIN film_director fd ON f.id = fd.film_id " +
+            "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
+            "WHERE fd.director_id = ? " +
+            "GROUP BY f.id " +
+            "ORDER BY COUNT(fl.film_id) DESC";
 
     private static final String GET_ALL_DIRECTOR_ID = "SELECT id " +
-                                                        "FROM director";
+            "FROM director";
 
     private static final String ADD_FILM_DIRECTOR = "INSERT " +
-                                                    "INTO film_director (film_id, director_id) " +
-                                                    "VALUES (?, ?)";
+            "INTO film_director (film_id, director_id) " +
+            "VALUES (?, ?)";
+
+    private static final String FIND_ALL_FILMS_DIRECTORS = "SELECT film_id, director_id, director_name " +
+            "FROM film_director fd, " +
+            "director d " +
+            "WHERE fd.director_id = d.id";
+
+    private static final String IS_DIRECTOR_EXISTS =
+            "SELECT EXISTS(SELECT 1 FROM director WHERE id = ?)";
+
+    private static final String INSERT_INTO_DIRECTORS =
+            "INSERT INTO directors(id, director_name) VALUES(?, ?)";
 
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper, MpaDbStorage mpaDbStorage,
                          GenreDbStorage genreDbStorage, LikeDbStorage likeDbStorage, DirectorDbStorage directorDbStorage) {
@@ -133,20 +147,20 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
         if (film.getDirectors() != null && !film.getDirectors().isEmpty()) {
 
             Set<Integer> directorsId = new HashSet<>(jdbc.queryForList(GET_ALL_DIRECTOR_ID, Integer.class));
+            Collection<Director> directors = directorDbStorage.getAllDirectors();
+
+            checkDirectorsAndInsertIfNotExists(directors.stream().toList());
+
             List<Object[]> batchArgs = new ArrayList<>();
 
             for (Director director : film.getDirectors()) {
                 if (directorsId.contains(director.getId())) {
                     batchArgs.add(new Object[]{film.getId(), director.getId()});
-                } else {
-                    throw new FindingException("Не найден режиссер id = " + director.getId());
                 }
             }
 
             jdbc.batchUpdate(ADD_FILM_DIRECTOR, batchArgs);
-
         }
-
         return film;
     }
 
@@ -164,15 +178,31 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
         );
 
         if (!film.getDirectors().isEmpty()) {
-
             List<Object[]> batchArgs = new ArrayList<>();
 
-            for (Director director : film.getDirectors()) {
-                batchArgs.add(new Object[]{film.getId(), director.getId()});
+            for (Director dir : film.getDirectors()) {
+                // Проверяем наличие режиссёра в таблице director
+                boolean directorExists = jdbc.queryForObject(
+                        IS_DIRECTOR_EXISTS,
+                        Boolean.class,
+                        dir.getId()
+                );
+
+                if (directorExists) {
+                    // Проверяем наличие пары (film_id, director_id) перед добавлением
+                    boolean exists = jdbc.queryForObject(
+                            "SELECT EXISTS(SELECT 1 FROM film_director WHERE film_id = ? AND director_id = ?)",
+                            Boolean.class,
+                            film.getId(), dir.getId()
+                    );
+
+                    if (!exists) {
+                        batchArgs.add(new Object[]{film.getId(), dir.getId()});
+                    }
+                }
             }
 
             jdbc.batchUpdate(ADD_FILM_DIRECTOR, batchArgs);
-
         }
 
         return getFilmById(film.getId());
@@ -183,9 +213,11 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
         Collection<Film> films = findMany(FIND_ALL);
         Map<Integer, Set<Genre>> genres = genreDbStorage.findAllFilmsGenres();
         Map<Integer, Collection<Integer>> likes = likeDbStorage.findAllFilmsLikes();
+        Map<Integer, Set<Director>> directors = findAllFilmsDirectors();
         for (Film film : films) {
             film.setGenres(genres.getOrDefault(film.getId(), new LinkedHashSet<>()));
             film.setLikes(likes.getOrDefault(film.getId(), new ArrayList<>()));
+            film.setDirectors(directors.getOrDefault(film.getId(), new LinkedHashSet<>()));
         }
         return films;
     }
@@ -249,5 +281,39 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
             film.setLikes(likes.getOrDefault(film.getId(), new ArrayList<>()));
         }
         return films;
+    }
+
+    public Map<Integer, Set<Director>> findAllFilmsDirectors() {
+        Map<Integer, Set<Director>> directors = new HashMap<>();
+        return jdbc.query(FIND_ALL_FILMS_DIRECTORS, (ResultSet resultSet) -> {
+            while (resultSet.next()) {
+                int filmId = resultSet.getInt("film_id");
+                int directorId = resultSet.getInt("director_id");
+                String directorName = resultSet.getString("director_name");
+                directors.computeIfAbsent(filmId, k -> new LinkedHashSet<>()).add(new Director(directorId, directorName));
+            }
+            return directors;
+        });
+    }
+
+    private void checkDirectorsAndInsertIfNotExists(
+            List<Director> directors) {
+
+        List<Object[]> batchArgsForInsertIntoDirectors = new ArrayList<>();
+
+        for (Director dir : directors) {
+
+            boolean directorExists = jdbc.queryForObject(
+                    IS_DIRECTOR_EXISTS,
+                    Boolean.class,
+                    dir.getId()
+            );
+
+            if (!directorExists) {
+                batchArgsForInsertIntoDirectors.add(new Object[]{dir.getId(), dir.getName()});
+            }
+
+            jdbc.batchUpdate(INSERT_INTO_DIRECTORS, batchArgsForInsertIntoDirectors);
+        }
     }
 }

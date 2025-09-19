@@ -38,7 +38,7 @@ public class FilmControllerTests {
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                        .andExpect(status().isCreated());
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -57,8 +57,8 @@ public class FilmControllerTests {
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
-                        .andExpect(status().isBadRequest())
-                        .andExpect(jsonPath("$.description").value("Максимальная длина описания — 200 символов."));
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.description").value("Максимальная длина описания — 200 символов."));
     }
 
     @Test
@@ -66,7 +66,7 @@ public class FilmControllerTests {
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
-                        .andExpect(status().is5xxServerError());
+                .andExpect(status().is5xxServerError());
     }
 
 }

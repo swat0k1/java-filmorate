@@ -84,4 +84,12 @@ public class FilmController {
         return filmService.delete(id);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Collection<Film>> getFoundFilms(
+            @RequestParam(name = "query", required = false) String textForSearch,
+            @RequestParam(name = "by", required = false) List<String> by
+    ) {
+        Collection<Film> foundFilmsSortedByPopularity = filmService.getFoundFilms(textForSearch, by);
+        return new ResponseEntity<>(foundFilmsSortedByPopularity, HttpStatus.OK);
+    }
 }
