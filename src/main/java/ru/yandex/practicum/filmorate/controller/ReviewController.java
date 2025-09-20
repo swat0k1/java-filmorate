@@ -32,7 +32,7 @@ public class ReviewController {
             @RequestParam(required = false) Integer filmId,
             @RequestParam(defaultValue = "10") Integer count
     ) {
-        int limit = Math.max(1, count); // страховка от 0/отрицательных
+        int limit = Math.max(1, count);
         return reviewService.getReviews(filmId, limit);
     }
 
@@ -49,25 +49,25 @@ public class ReviewController {
     @PutMapping("/{id}/like/{userId}")
     public Review addLike(@PathVariable("id") @NotNull int id,
                           @PathVariable("userId") @NotNull int userId) {
-        return reviewService.addUsersLike(id, userId);
+        return reviewService.addUserLike(id, userId);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
     public Review addDislike(@PathVariable("id") @NotNull int id,
                              @PathVariable("userId") @NotNull int userId) {
-        return reviewService.addUsersDislike(id, userId);
+        return reviewService.addUserDislike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public Review removeLike(@PathVariable("id") @NotNull int id,
                              @PathVariable("userId") @NotNull int userId) {
-        return reviewService.deleteUsersLike(id, userId);
+        return reviewService.deleteUserLike(id, userId);
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
     public Review removeDislike(@PathVariable("id") @NotNull int id,
                                 @PathVariable("userId") @NotNull int userId) {
-        return reviewService.deleteUsersDislike(id, userId);
+        return reviewService.deleteUserDislike(id, userId);
     }
 
 }

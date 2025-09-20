@@ -28,19 +28,19 @@ public class ReviewDbStorage extends BaseRepository<Review> {
             "WHERE film_id = ?";
 
     private static final String GET_ALL_ORDERED_LIMIT = """
-        SELECT *
-        FROM reviews
-        ORDER BY useful DESC, review_id ASC
-        LIMIT ?
-        """;
+            SELECT *
+            FROM reviews
+            ORDER BY useful DESC, review_id ASC
+            LIMIT ?
+            """;
 
     private static final String GET_BY_FILM_ORDERED_LIMIT = """
-        SELECT *
-        FROM reviews
-        WHERE film_id = ?
-        ORDER BY useful DESC, review_id ASC
-        LIMIT ?
-        """;
+            SELECT *
+            FROM reviews
+            WHERE film_id = ?
+            ORDER BY useful DESC, review_id ASC
+            LIMIT ?
+            """;
 
     private static final String UPDATE_REVIEW = "UPDATE reviews " +
             "SET content = ?, is_positive = ?, useful = ? " +
@@ -67,10 +67,6 @@ public class ReviewDbStorage extends BaseRepository<Review> {
     private static final String DELETE_LIKE_DISLIKE = "DELETE " +
             "FROM review_likes " +
             "WHERE review_id = ? AND user_id = ? AND is_like = ?";
-
-    private static final String DELETE_ALL_LIKES = "DELETE " +
-            "FROM review_likes " +
-            "WHERE review_id = ?";
 
     public ReviewDbStorage(JdbcTemplate jdbc, RowMapper<Review> mapper) {
         super(jdbc, mapper, Review.class);
@@ -173,27 +169,27 @@ public class ReviewDbStorage extends BaseRepository<Review> {
 
     }
 
-    public boolean hasUsersLike(int reviewId, int userId) {
+    public boolean hasUserLike(int reviewId, int userId) {
 
         try {
-            return Boolean.TRUE.equals(jdbc.queryForObject(HAS_LIKE_DISLIKE, Boolean.class, reviewId, userId, true));
+            return jdbc.queryForObject(HAS_LIKE_DISLIKE, Boolean.class, reviewId, userId, true);
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка проверки наличия лайка.");
         }
 
     }
 
-    public boolean hasUsersDislike(int reviewId, int userId) {
+    public boolean hasUserDislike(int reviewId, int userId) {
 
         try {
-            return Boolean.TRUE.equals(jdbc.queryForObject(HAS_LIKE_DISLIKE, Boolean.class, reviewId, userId, false));
+            return jdbc.queryForObject(HAS_LIKE_DISLIKE, Boolean.class, reviewId, userId, false);
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка проверки наличия дислайка.");
         }
 
     }
 
-    public void addUsersLike(int reviewId, int userId) {
+    public void addUserLike(int reviewId, int userId) {
 
         try {
             update(ADD_LIKE_DISLIKE, reviewId, userId, true);
@@ -203,7 +199,7 @@ public class ReviewDbStorage extends BaseRepository<Review> {
 
     }
 
-    public void addUsersDislike(int reviewId, int userId) {
+    public void addUserDislike(int reviewId, int userId) {
 
         try {
             update(ADD_LIKE_DISLIKE, reviewId, userId, false);
@@ -229,16 +225,6 @@ public class ReviewDbStorage extends BaseRepository<Review> {
             jdbc.update(DELETE_LIKE_DISLIKE, reviewId, userId, false);
         } catch (InternalServerException e) {
             throw new InternalServerException("Ошибка удаления дислайка.");
-        }
-
-    }
-
-    public void deleteAllLikesByReviewId(int reviewId) {
-
-        try {
-            jdbc.update(DELETE_ALL_LIKES, reviewId);
-        } catch (InternalServerException e) {
-            throw new InternalServerException("Ошибка удаления лайков.");
         }
 
     }

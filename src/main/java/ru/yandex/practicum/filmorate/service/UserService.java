@@ -63,9 +63,9 @@ public class UserService {
         User friend = userStorage.getUserById(friendId);
         if (user.getFriends().contains(friend.getId())) {
             friendDbStorage.deleteFriend(userId, friendId);
+            userFeedDbStorage.save(new UserFeed(userId, EventType.FRIEND,
+                    Operation.REMOVE, friendId));
         }
-        userFeedDbStorage.save(new UserFeed(userId, EventType.FRIEND,
-                Operation.REMOVE, friendId));
         return userStorage.getUserById(userId);
 
     }

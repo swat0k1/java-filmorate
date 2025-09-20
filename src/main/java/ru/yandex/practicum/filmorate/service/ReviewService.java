@@ -38,7 +38,7 @@ public class ReviewService {
         checkUserFilm(userId, filmId);
         review.setUseful(0);
         Review reviewDb = reviewStorage.addReview(review);
-        userFeedDbStorage.save(new UserFeed(userId, EventType.REVIEW,
+        userFeedDbStorage.save(new UserFeed(reviewDb.getUserId(), EventType.REVIEW,
                 Operation.ADD, reviewDb.getReviewId()));
         return reviewDb;
     }
@@ -68,93 +68,74 @@ public class ReviewService {
         int userId = review.getUserId();
         Review reviewDb = getReview(newReviewId);
         checkUserFilm(userId, filmId);
-
         reviewDb.setContent(review.getContent());
         reviewDb.setIsPositive(review.getIsPositive());
         reviewDb.setUseful(reviewStorage.getAmountOfLikes(newReviewId) - reviewStorage.getAmountOfDislikes(newReviewId));
         Review updatedReview = reviewStorage.updateReview(reviewDb);
-        userFeedDbStorage.save(new UserFeed(userId, EventType.REVIEW,
-                Operation.UPDATE, newReviewId));
+        userFeedDbStorage.save(new UserFeed(updatedReview.getUserId(), EventType.REVIEW,
+                Operation.UPDATE, updatedReview.getReviewId()));
         return updatedReview;
 
     }
 
+    @Transactional
     public void deleteReviewById(int reviewId) {
         Review review = reviewStorage.getReview(reviewId);
-        reviewStorage.deleteAllLikesByReviewId(reviewId);
         reviewStorage.deleteReviewById(reviewId);
+        userFeedDbStorage.save(new UserFeed(review.getUserId(), EventType.REVIEW,
+                Operation.REMOVE, reviewId));
     }
 
     @Transactional
-    public Review addUsersLike(int reviewId, int userId) {
-
+    public Review addUserLike(int reviewId, int userId) {
         checkReviewUser(reviewId, userId);
-        if (reviewStorage.hasUsersLike(reviewId, userId)) {
+        if (reviewStorage.hasUserLike(reviewId, userId)) {
             return getReview(reviewId);
-        } else if (reviewStorage.hasUsersDislike(reviewId, userId)) {
-            userFeedDbStorage.save(new UserFeed(userId, EventType.LIKE,
-                    Operation.REMOVE, reviewId));
+        } else if (reviewStorage.hasUserDislike(reviewId, userId)) {
             reviewStorage.deleteUsersDislike(reviewId, userId);
             return getReview(reviewId);
         }
-
-        reviewStorage.addUsersLike(reviewId, userId);
-        userFeedDbStorage.save(new UserFeed(userId, EventType.LIKE,
-                Operation.ADD, reviewId));
-
+        reviewStorage.addUserLike(reviewId, userId);
         return calculateUseful(reviewId);
     }
 
-    public Review addUsersDislike(int reviewId, int userId) {
-
+    @Transactional
+    public Review addUserDislike(int reviewId, int userId) {
         checkReviewUser(reviewId, userId);
-        if (reviewStorage.hasUsersDislike(reviewId, userId)) {
+        if (reviewStorage.hasUserDislike(reviewId, userId)) {
             return getReview(reviewId);
-        } else if (reviewStorage.hasUsersLike(reviewId, userId)) {
+        } else if (reviewStorage.hasUserLike(reviewId, userId)) {
             reviewStorage.deleteUsersLike(reviewId, userId);
+            return getReview(reviewId);
         }
-
-        reviewStorage.addUsersDislike(reviewId, userId);
-        userFeedDbStorage.save(new UserFeed(userId, EventType.LIKE,
-                Operation.REMOVE, reviewId));
-
+        reviewStorage.addUserDislike(reviewId, userId);
         return calculateUseful(reviewId);
-
     }
 
-    public Review deleteUsersLike(int reviewId, int userId) {
-
+    public Review deleteUserLike(int reviewId, int userId) {
         checkReviewUser(reviewId, userId);
-
-        if (reviewStorage.hasUsersLike(reviewId, userId)) {
+        if (reviewStorage.hasUserLike(reviewId, userId)) {
             reviewStorage.deleteUsersLike(reviewId, userId);
         }
         return calculateUseful(reviewId);
 
     }
 
-    public Review deleteUsersDislike(int reviewId, int userId) {
-
+    public Review deleteUserDislike(int reviewId, int userId) {
         checkReviewUser(reviewId, userId);
-
-        if (reviewStorage.hasUsersDislike(reviewId, userId)) {
+        if (reviewStorage.hasUserDislike(reviewId, userId)) {
             reviewStorage.deleteUsersDislike(reviewId, userId);
         }
-
         return calculateUseful(reviewId);
-
     }
 
     private Review calculateUseful(int reviewId) {
-
         Review review = getReview(reviewId);
         review.setUseful(reviewStorage.getAmountOfLikes(reviewId) - reviewStorage.getAmountOfDislikes(reviewId));
         return reviewStorage.updateReview(review);
-
     }
 
     private void checkUserFilm(int userId, int filmId) {
-
         if (userId == 0) {
             throw new ValidationException("Ошибка id пользователя");
         }
