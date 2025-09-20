@@ -71,7 +71,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
             "SELECT * " +
                     "FROM films f " +
                     "LEFT JOIN rating_mpa m " +
-                    "ON f.rating_id = m.mpa_id " +     // ← фикс здесь
+                    "ON f.rating_id = m.mpa_id " +
                     "JOIN film_genres fg ON f.id = fg.film_id " +
                     "JOIN genres g ON fg.genre_id = g.id " +
                     "LEFT JOIN (" +
