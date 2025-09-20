@@ -13,11 +13,8 @@ import ru.yandex.practicum.filmorate.storage.dbStorage.LikeDbStorage;
 import ru.yandex.practicum.filmorate.storage.dbStorage.UserFeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service

@@ -41,8 +41,6 @@ public class FilmDbStorageTest {
     private final FilmDbStorage filmDbStorage;
     private final LikeDbStorage likeDbStorage;
     private final UserDbStorage userDbStorage;
-    private final GenreDbStorage genreDbStorage;
-    private final DirectorDbStorage directorDbStorage;
 
     private Film film1;
     private Film film2;
