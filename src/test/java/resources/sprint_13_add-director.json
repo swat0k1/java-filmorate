@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "8ed6b8f0-1e77-445f-8736-87dd5f364b51",
-    "name": "add-database",
+    "_postman_id": "58945df0-83f3-4bb3-a24b-27fac12d57e0",
+    "name": "add-director",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "23073145",
-    "_collection_link": "https://universal-shadow-295426.postman.co/workspace/My-Workspace~4200f6aa-0504-44b1-8a1d-707d0dcbd5ce/collection/23073145-8ed6b8f0-1e77-445f-8736-87dd5f364b51?action=share&source=collection_link&creator=23073145"
+    "_collection_link": "https://universal-shadow-295426.postman.co/workspace/My-Workspace~4200f6aa-0504-44b1-8a1d-707d0dcbd5ce/collection/13708500-58945df0-83f3-4bb3-a24b-27fac12d57e0?action=share&source=collection_link&creator=23073145"
   },
   "item": [
     {
@@ -1683,7 +1683,8 @@
                   "\r",
                   ""
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {}
               }
             },
             {
@@ -1723,7 +1724,8 @@
                   "    100 \r",
                   ");"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {}
               }
             }
           ],
@@ -1817,7 +1819,8 @@
                   "\r",
                   ""
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {}
               }
             },
             {
@@ -1861,7 +1864,8 @@
                   "    100 \r",
                   ");"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {}
               }
             }
           ],
@@ -2267,7 +2271,8 @@
                   "\r",
                   ""
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {}
               }
             },
             {
@@ -2317,7 +2322,8 @@
                   "    100 \r",
                   ");"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {}
               }
             }
           ],
@@ -2370,7 +2376,8 @@
                   "});\r",
                   ""
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {}
               }
             },
             {
@@ -2420,7 +2427,8 @@
                   "    100 \r",
                   ");"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {}
               }
             }
           ],
@@ -2533,7 +2541,8 @@
                   "\r",
                   ""
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {}
               }
             },
             {
@@ -2582,7 +2591,8 @@
                   "    100 \r",
                   ");"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {}
               }
             }
           ],
@@ -2630,7 +2640,8 @@
                   "});\r",
                   ""
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {}
               }
             },
             {
@@ -2668,7 +2679,8 @@
                   "    100 \r",
                   ");"
                 ],
-                "type": "text/javascript"
+                "type": "text/javascript",
+                "packages": {}
               }
             }
           ],
@@ -4978,6 +4990,1169 @@
           ]
         }
       ]
+    },
+    {
+      "name": "add-director",
+      "item": [
+        {
+          "name": "Get list of directors",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const main = async () => {\r",
+                  "    const api = new API(pm);\r",
+                  "    const rnd = new RandomUtils();\r",
+                  "\r",
+                  "    let user, film, review;\r",
+                  "    try {\r",
+                  "        director = await api.addDirector({name: rnd.getName(25)});\r",
+                  "        pm.collectionVariables.set(\"director\", director);\r",
+                  "    } catch(err) {\r",
+                  "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+                  "    }\r",
+                  "\r",
+                  "};\r",
+                  "\r",
+                  "const interval = setInterval(() => {}, 1000);\r",
+                  "\r",
+                  "setTimeout(async () => \r",
+                  "    {\r",
+                  "        try {\r",
+                  "            await main();\r",
+                  "        } catch (e) {\r",
+                  "            console.error(e);\r",
+                  "        } finally {\r",
+                  "            clearInterval(interval);\r",
+                  "        }\r",
+                  "    },  \r",
+                  "    100 \r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const director1 = pm.collectionVariables.get(\"director\")\r",
+                  "\r",
+                  "pm.test(\"Status code is 200 or 201\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200,201]);\r",
+                  "});\r",
+                  "pm.test(\"Has director get response\", function () {\r",
+                  "    pm.response.to.be.withBody;\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "pm.test(\"Test director 'id' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData[jsonData.length - 1]).to.have.property('id');\r",
+                  "    pm.expect(jsonData[jsonData.length - 1].id).to.eql(director1.id);\r",
+                  "});\r",
+                  "pm.test(\"Test director 'name' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData[jsonData.length - 1]).to.have.property('name');\r",
+                  "    pm.expect(jsonData[jsonData.length - 1].name).to.eql(director1.name);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/directors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "directors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get director of the film",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const main = async () => {\r",
+                  "    const api = new API(pm);\r",
+                  "    const rnd = new RandomUtils();\r",
+                  "\r",
+                  "    let user, film, review;\r",
+                  "    try {\r",
+                  "        film = await api.addFilm(rnd.getFilm());\r",
+                  "        pm.collectionVariables.set(\"film_id\", film.id);\r",
+                  "        pm.collectionVariables.set(\"film\", film);\r",
+                  "    } catch(err) {\r",
+                  "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+                  "    }\r",
+                  "\r",
+                  "};\r",
+                  "\r",
+                  "const interval = setInterval(() => {}, 1000);\r",
+                  "\r",
+                  "setTimeout(async () => \r",
+                  "    {\r",
+                  "        try {\r",
+                  "            await main();\r",
+                  "        } catch (e) {\r",
+                  "            console.error(e);\r",
+                  "        } finally {\r",
+                  "            clearInterval(interval);\r",
+                  "        }\r",
+                  "    },  \r",
+                  "    100 \r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "film = pm.collectionVariables.get(\"film\")\r",
+                  "\r",
+                  "pm.test(\"The film must have directors\", function () {\r",
+                  "    pm.expect(film.directors, '').to.eql(pm.response.json().directors);  \r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('directors');\r",
+                  "    pm.expect(jsonData.directors.length, '\"directors\" field must be have 1 director').to.eql(film.directors.length);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/films/{{film_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "films",
+                "{{film_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get director by id",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const main = async () => {\r",
+                  "    const api = new API(pm);\r",
+                  "    const rnd = new RandomUtils();\r",
+                  "\r",
+                  "    let user, film, review;\r",
+                  "    try {\r",
+                  "        director = await api.addDirector({name: rnd.getName(25)});\r",
+                  "        pm.collectionVariables.set(\"director\", director);\r",
+                  "        pm.collectionVariables.set(\"director_id\", director.id);\r",
+                  "\r",
+                  "    } catch(err) {\r",
+                  "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+                  "    }\r",
+                  "\r",
+                  "};\r",
+                  "\r",
+                  "const interval = setInterval(() => {}, 1000);\r",
+                  "\r",
+                  "setTimeout(async () => \r",
+                  "    {\r",
+                  "        try {\r",
+                  "            await main();\r",
+                  "        } catch (e) {\r",
+                  "            console.error(e);\r",
+                  "        } finally {\r",
+                  "            clearInterval(interval);\r",
+                  "        }\r",
+                  "    },  \r",
+                  "    100 \r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const director1 = pm.collectionVariables.get(\"director\")\r",
+                  "\r",
+                  "pm.test(\"Status code is 200 or 201\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200,201]);\r",
+                  "});\r",
+                  "pm.test(\"Has director get response\", function () {\r",
+                  "    pm.response.to.be.withBody;\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "pm.test(\"Test director 'id' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('id');\r",
+                  "    pm.expect(jsonData.id).to.eql(director1.id);\r",
+                  "});\r",
+                  "pm.test(\"Test director 'name' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('name');\r",
+                  "    pm.expect(jsonData.name).to.eql(director1.name);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/directors/{{director_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "directors",
+                "{{director_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get unknown director by id",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const main = async () => {\r",
+                  "    const api = new API(pm);\r",
+                  "    const rnd = new RandomUtils();\r",
+                  "\r",
+                  "    let user, film, review;\r",
+                  "    try {\r",
+                  "        director = await api.addDirector({name: rnd.getName(25)});\r",
+                  "        pm.collectionVariables.set(\"director_id\", director.id + 1);\r",
+                  "\r",
+                  "    } catch(err) {\r",
+                  "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+                  "    }\r",
+                  "\r",
+                  "};\r",
+                  "\r",
+                  "const interval = setInterval(() => {}, 1000);\r",
+                  "\r",
+                  "setTimeout(async () => \r",
+                  "    {\r",
+                  "        try {\r",
+                  "            await main();\r",
+                  "        } catch (e) {\r",
+                  "            console.error(e);\r",
+                  "        } finally {\r",
+                  "            clearInterval(interval);\r",
+                  "        }\r",
+                  "    },  \r",
+                  "    100 \r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {\r",
+                  "    pm.expect(pm.response.code).to.eql(404);\r",
+                  "});\r",
+                  "pm.test(\"Has director get response\", function () {\r",
+                  "    pm.response.to.be.withBody;\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "pm.test(\"Test director 'error' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('error');\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/directors/{{director_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "directors",
+                "{{director_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change director name by id",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const main = async () => {\r",
+                  "    const api = new API(pm);\r",
+                  "    const rnd = new RandomUtils();\r",
+                  "\r",
+                  "    let user, film, review;\r",
+                  "    try {\r",
+                  "        director = await api.addDirector({name: rnd.getName(25)});\r",
+                  "        pm.collectionVariables.set(\"director_id\", director.id);\r",
+                  "        name = rnd.getName(25)\r",
+                  "        pm.collectionVariables.set(\"name_to_change\", name);\r",
+                  "\r",
+                  "    } catch(err) {\r",
+                  "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+                  "    }\r",
+                  "\r",
+                  "};\r",
+                  "\r",
+                  "const interval = setInterval(() => {}, 1000);\r",
+                  "\r",
+                  "setTimeout(async () => \r",
+                  "    {\r",
+                  "        try {\r",
+                  "            await main();\r",
+                  "        } catch (e) {\r",
+                  "            console.error(e);\r",
+                  "        } finally {\r",
+                  "            clearInterval(interval);\r",
+                  "        }\r",
+                  "    },  \r",
+                  "    100 \r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const name1 = pm.collectionVariables.get(\"name_to_change\")\r",
+                  "const director_id1 = pm.collectionVariables.get(\"director_id\")\r",
+                  "\r",
+                  "pm.test(\"Status code is 200 or 201\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200,201]);\r",
+                  "});\r",
+                  "pm.test(\"Has director put response\", function () {\r",
+                  "    pm.response.to.be.withBody;\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "pm.test(\"Test director 'id' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('id');\r",
+                  "    pm.expect(jsonData.id).to.eql(director_id1);\r",
+                  "});\r",
+                  "pm.test(\"Test director 'name' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('name');\r",
+                  "    pm.expect(jsonData.name).to.eql(name1);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": {{director_id}},\r\n    \"name\": \"{{name_to_change}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/directors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "directors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change unknown director name by id",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const main = async () => {\r",
+                  "    const api = new API(pm);\r",
+                  "    const rnd = new RandomUtils();\r",
+                  "\r",
+                  "    let user, film, review;\r",
+                  "    try {\r",
+                  "        director = await api.addDirector({name: rnd.getName(25)});\r",
+                  "        pm.collectionVariables.set(\"director_id\", director.id + 1);\r",
+                  "        name = rnd.getName(25)\r",
+                  "        pm.collectionVariables.set(\"name_to_change\", name);\r",
+                  "\r",
+                  "    } catch(err) {\r",
+                  "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+                  "    }\r",
+                  "\r",
+                  "};\r",
+                  "\r",
+                  "const interval = setInterval(() => {}, 1000);\r",
+                  "\r",
+                  "setTimeout(async () => \r",
+                  "    {\r",
+                  "        try {\r",
+                  "            await main();\r",
+                  "        } catch (e) {\r",
+                  "            console.error(e);\r",
+                  "        } finally {\r",
+                  "            clearInterval(interval);\r",
+                  "        }\r",
+                  "    },  \r",
+                  "    100 \r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {\r",
+                  "    pm.expect(pm.response.code).to.eql(404);\r",
+                  "});\r",
+                  "pm.test(\"Has director get response\", function () {\r",
+                  "    pm.response.to.be.withBody;\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "pm.test(\"Test director 'error' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('error');\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": {{director_id}},\r\n    \"name\": \"{{name_to_change}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/directors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "directors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete director by id",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const main = async () => {\r",
+                  "    const api = new API(pm);\r",
+                  "    const rnd = new RandomUtils();\r",
+                  "\r",
+                  "    let user, film, review;\r",
+                  "    try {\r",
+                  "        director = await api.addDirector({name: rnd.getName(25)});\r",
+                  "        pm.collectionVariables.set(\"director_id\", director.id);\r",
+                  "\r",
+                  "    } catch(err) {\r",
+                  "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+                  "    }\r",
+                  "\r",
+                  "};\r",
+                  "\r",
+                  "const interval = setInterval(() => {}, 1000);\r",
+                  "\r",
+                  "setTimeout(async () => \r",
+                  "    {\r",
+                  "        try {\r",
+                  "            await main();\r",
+                  "        } catch (e) {\r",
+                  "            console.error(e);\r",
+                  "        } finally {\r",
+                  "            clearInterval(interval);\r",
+                  "        }\r",
+                  "    },  \r",
+                  "    100 \r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200 or 204\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200,204]);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/directors/{{director_id}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "directors",
+                "{{director_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create bad name director",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const main = async () => {\r",
+                  "    const api = new API(pm);\r",
+                  "    const rnd = new RandomUtils();\r",
+                  "\r",
+                  "    let user, film, review;\r",
+                  "    try {\r",
+                  "        director = await api.addDirector({name: \" \"});\r",
+                  "        pm.collectionVariables.set(\"director\", director);\r",
+                  "    } catch(err) {\r",
+                  "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+                  "    }\r",
+                  "\r",
+                  "};\r",
+                  "\r",
+                  "const interval = setInterval(() => {}, 1000);\r",
+                  "\r",
+                  "setTimeout(async () => \r",
+                  "    {\r",
+                  "        try {\r",
+                  "            await main();\r",
+                  "        } catch (e) {\r",
+                  "            console.error(e);\r",
+                  "        } finally {\r",
+                  "            clearInterval(interval);\r",
+                  "        }\r",
+                  "    },  \r",
+                  "    100 \r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 500 or 400\", function () {\r",
+                  "     pm.expect(pm.response.code).to.be.oneOf([500,400]);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/directors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "directors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change film director",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const main = async () => {\r",
+                  "    const api = new API(pm);\r",
+                  "    const rnd = new RandomUtils();\r",
+                  "\r",
+                  "    try {\r",
+                  "        film = await api.addFilm(rnd.getFilm())\r",
+                  "        pm.collectionVariables.set(\"film_id\", film.id);\r",
+                  "        new_director = await api.addDirector({name: rnd.getName(25)})\r",
+                  "        pm.collectionVariables.set(\"director_id\", new_director.id);\r",
+                  "\r",
+                  "    } catch(err) {\r",
+                  "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+                  "    }\r",
+                  "\r",
+                  "};\r",
+                  "\r",
+                  "const interval = setInterval(() => {}, 1000);\r",
+                  "\r",
+                  "setTimeout(async () => \r",
+                  "    {\r",
+                  "        try {\r",
+                  "            await main();\r",
+                  "        } catch (e) {\r",
+                  "            console.error(e);\r",
+                  "        } finally {\r",
+                  "            clearInterval(interval);\r",
+                  "        }\r",
+                  "    },  \r",
+                  "    100 \r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const film_id1 = pm.collectionVariables.get(\"film_id\")\r",
+                  "const director_id1 = pm.collectionVariables.get(\"director_id\")\r",
+                  "\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.be.ok;\r",
+                  "});\r",
+                  "pm.test(\"Has film update response\", function () {\r",
+                  "    pm.response.to.be.withBody;\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "pm.test(\"Test film 'id' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('id');\r",
+                  "    pm.expect(jsonData.id).to.eql(film_id1);\r",
+                  "});\r",
+                  "pm.test(\"Test film 'directors' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.have.property('directors');\r",
+                  "    pm.expect(jsonData.directors.length, '\"directors\" field must be have 1 director').to.eql(1);\r",
+                  "    pm.expect(jsonData.directors[0]).to.have.property('id');\r",
+                  "    pm.expect(jsonData.directors[0].id).to.eql(director_id1);    \r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"id\": {{film_id}},\r\n  \"name\": \"Film Updated\",\r\n  \"releaseDate\": \"2089-04-17\",\r\n  \"description\": \"New film update decription\",\r\n  \"duration\": 190,\r\n  \"rate\": 4,\r\n  \"mpa\": { \"id\": 5},\r\n  \"directors\": [{ \"id\": {{director_id}}}]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/films",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "films"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get films by director id sorted by year",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "film0 = pm.collectionVariables.get(\"film1\")\r",
+                  "film1 = pm.collectionVariables.get(\"film2\")\r",
+                  "director = pm.collectionVariables.get(\"director\")\r",
+                  "\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.be.ok;\r",
+                  "});\r",
+                  "pm.test(\"Test list film with director response\", function () {\r",
+                  "    pm.response.to.be.withBody;\r",
+                  "    pm.response.to.be.json;\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.length, 'List length must be 2').to.eql(2);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Test film[0] 'id' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData[0]).to.have.property('id');\r",
+                  "    pm.expect(jsonData[0].id).to.eql(film0.id);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Test film[0] 'releaseDate' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData[0]).to.have.property('releaseDate');\r",
+                  "    pm.expect(jsonData[0].releaseDate, '\"releaseDate\" field must be \"2000-04-17\"').to.eql('2000-04-17');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Test film[0] 'directors' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData[0]).to.have.property('directors');\r",
+                  "    pm.expect(jsonData[0].directors.length, '\"directors\" field must be have 1 director').to.eql(1);\r",
+                  "    pm.expect(jsonData[0].directors[0]).to.have.property('id');\r",
+                  "    pm.expect(jsonData[0].directors[0].id).to.eql(director.id);    \r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Test film[1] 'id' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData[1]).to.have.property('id');\r",
+                  "    pm.expect(jsonData[1].id).to.eql(film1.id);\r",
+                  "});\r",
+                  "pm.test(\"Test film[1] 'releaseDate' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData[1]).to.have.property('releaseDate');\r",
+                  "    pm.expect(jsonData[1].releaseDate, '\"releaseDate\" field must be \"2001-04-17\"').to.eql('2001-04-17');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Test film[1] 'directors' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData[1]).to.have.property('directors');\r",
+                  "    pm.expect(jsonData[1].directors.length, '\"directors\" field must be have 1 director').to.eql(1);\r",
+                  "    pm.expect(jsonData[1].directors[0]).to.have.property('id');\r",
+                  "    pm.expect(jsonData[1].directors[0].id).to.eql(director.id);    \r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const main = async () => {\r",
+                  "    const api = new API(pm);\r",
+                  "    const rnd = new RandomUtils();\r",
+                  "\r",
+                  "    try {\r",
+                  "        director_name = await rnd.getName(25)\r",
+                  "        director = await api.addDirector({name: director_name})\r",
+                  "        film1 = await api.addFilm(rnd.getFilm(director))\r",
+                  "        film2 = await api.addFilm(rnd.getFilm(director))\r",
+                  "        pm.sendRequest({\r",
+                  "            url : \"http://localhost:8080/films\",\r",
+                  "            method : \"PUT\",\r",
+                  "            header: { 'content-type': 'application/json' }, \r",
+                  "            body: { \r",
+                  "                mode: 'raw', \r",
+                  "                raw: JSON.stringify({\r",
+                  "                \"id\": film1.id,\r",
+                  "                \"name\": \"Film Updated\",\r",
+                  "                \"releaseDate\": \"2000-04-17\",\r",
+                  "                \"description\": \"New film update decription\",\r",
+                  "                \"duration\": 190,\r",
+                  "                \"rate\": 4,\r",
+                  "                \"mpa\": { \"id\": 5},\r",
+                  "                \"directors\": [{ \"id\": director.id}]\r",
+                  "            })},\r",
+                  "          } , (error, response) => {\r",
+                  "\r",
+                  "        });\r",
+                  "        pm.sendRequest({\r",
+                  "            url : \"http://localhost:8080/films\",\r",
+                  "            method : \"PUT\",\r",
+                  "            header: { 'content-type': 'application/json' }, \r",
+                  "            body: { \r",
+                  "                mode: 'raw', \r",
+                  "                raw: JSON.stringify({\r",
+                  "                \"id\": film2.id,\r",
+                  "                \"name\": \"Film Updated\",\r",
+                  "                \"releaseDate\": \"2001-04-17\",\r",
+                  "                \"description\": \"New film update decription\",\r",
+                  "                \"duration\": 190,\r",
+                  "                \"rate\": 4,\r",
+                  "                \"mpa\": { \"id\": 5},\r",
+                  "                \"directors\": [{ \"id\": director.id}]\r",
+                  "            })},\r",
+                  "          } , (error, response) => {\r",
+                  "\r",
+                  "        });\r",
+                  "        pm.collectionVariables.set(\"film1\", film1);\r",
+                  "        pm.collectionVariables.set(\"film2\", film2);\r",
+                  "        pm.collectionVariables.set(\"director\", director);\r",
+                  "        pm.collectionVariables.set(\"director_id\", director.id);\r",
+                  "\r",
+                  "\r",
+                  "    } catch(err) {\r",
+                  "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+                  "    }\r",
+                  "\r",
+                  "};\r",
+                  "\r",
+                  "const interval = setInterval(() => {}, 1000);\r",
+                  "\r",
+                  "setTimeout(async () => \r",
+                  "    {\r",
+                  "        try {\r",
+                  "            await main();\r",
+                  "        } catch (e) {\r",
+                  "            console.error(e);\r",
+                  "        } finally {\r",
+                  "            clearInterval(interval);\r",
+                  "        }\r",
+                  "    },  \r",
+                  "    100 \r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/films/director/:directorId?sortBy=year",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "films",
+                "director",
+                ":directorId"
+              ],
+              "query": [
+                {
+                  "key": "sortBy",
+                  "value": "year"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "directorId",
+                  "value": "{{director_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get films by director id sorted by likes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "film0 = pm.collectionVariables.get(\"film1\")\r",
+                  "film1 = pm.collectionVariables.get(\"film2\")\r",
+                  "director = pm.collectionVariables.get(\"director\")\r",
+                  "\r",
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.be.ok;\r",
+                  "});\r",
+                  "pm.test(\"Test list film with director response\", function () {\r",
+                  "    pm.response.to.be.withBody;\r",
+                  "    pm.response.to.be.json;\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData.length, 'List length must be 2').to.eql(2);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Test film[0] 'id' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData[0]).to.have.property('id');\r",
+                  "    pm.expect(jsonData[0].id).to.eql(film0.id);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Test film[0] 'releaseDate' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData[0]).to.have.property('releaseDate');\r",
+                  "    pm.expect(jsonData[0].releaseDate, '\"releaseDate\" field must be \"2002-04-17\"').to.eql('2002-04-17');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Test film[0] 'directors' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData[0]).to.have.property('directors');\r",
+                  "    pm.expect(jsonData[0].directors.length, '\"directors\" field must be have 1 director').to.eql(1);\r",
+                  "    pm.expect(jsonData[0].directors[0]).to.have.property('id');\r",
+                  "    pm.expect(jsonData[0].directors[0].id).to.eql(director.id);    \r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Test film[1] 'id' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData[1]).to.have.property('id');\r",
+                  "    pm.expect(jsonData[1].id).to.eql(film1.id);\r",
+                  "});\r",
+                  "pm.test(\"Test film[1] 'releaseDate' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData[1]).to.have.property('releaseDate');\r",
+                  "    pm.expect(jsonData[1].releaseDate, '\"releaseDate\" field must be \"2001-04-17\"').to.eql('2001-04-17');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Test film[1] 'directors' field\", function () {\r",
+                  "    var jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData[1]).to.have.property('directors');\r",
+                  "    pm.expect(jsonData[1].directors.length, '\"directors\" field must be have 1 director').to.eql(1);\r",
+                  "    pm.expect(jsonData[1].directors[0]).to.have.property('id');\r",
+                  "    pm.expect(jsonData[1].directors[0].id).to.eql(director.id);    \r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const main = async () => {\r",
+                  "    const api = new API(pm);\r",
+                  "    const rnd = new RandomUtils();\r",
+                  "\r",
+                  "    try {\r",
+                  "        user1 = await api.addUser(rnd.getUser())\r",
+                  "        user2 = await api.addUser(rnd.getUser())\r",
+                  "        director_name = await rnd.getName(25)\r",
+                  "        director = await api.addDirector({name: director_name})\r",
+                  "        film1 = await api.addFilm(rnd.getFilm(director))\r",
+                  "        film2 = await api.addFilm(rnd.getFilm(director))\r",
+                  "        pm.sendRequest({\r",
+                  "            url : \"http://localhost:8080/films\",\r",
+                  "            method : \"PUT\",\r",
+                  "            header: { 'content-type': 'application/json' }, \r",
+                  "            body: { \r",
+                  "                mode: 'raw', \r",
+                  "                raw: JSON.stringify({\r",
+                  "                \"id\": film1.id,\r",
+                  "                \"name\": \"Film Updated\",\r",
+                  "                \"releaseDate\": \"2002-04-17\",\r",
+                  "                \"description\": \"New film update decription\",\r",
+                  "                \"duration\": 190,\r",
+                  "                \"rate\": 4,\r",
+                  "                \"mpa\": { \"id\": 5},\r",
+                  "                \"directors\": [{ \"id\": director.id}]\r",
+                  "            })},\r",
+                  "          } , (error, response) => {\r",
+                  "\r",
+                  "        });\r",
+                  "        pm.sendRequest({\r",
+                  "            url : \"http://localhost:8080/films/\" + film1.id + \"/like/\" + user1.id,\r",
+                  "            method : \"PUT\"\r",
+                  "            \r",
+                  "          } , (error, response) => {\r",
+                  "\r",
+                  "        });\r",
+                  "        pm.sendRequest({\r",
+                  "            url : \"http://localhost:8080/films/\" + film1.id + \"/like/\" + user2.id,\r",
+                  "            method : \"PUT\"\r",
+                  "            \r",
+                  "          } , (error, response) => {\r",
+                  "\r",
+                  "        });\r",
+                  "        pm.sendRequest({\r",
+                  "            url : \"http://localhost:8080/films\",\r",
+                  "            method : \"PUT\",\r",
+                  "            header: { 'content-type': 'application/json' }, \r",
+                  "            body: { \r",
+                  "                mode: 'raw', \r",
+                  "                raw: JSON.stringify({\r",
+                  "                \"id\": film2.id,\r",
+                  "                \"name\": \"Film Updated\",\r",
+                  "                \"releaseDate\": \"2001-04-17\",\r",
+                  "                \"description\": \"New film update decription\",\r",
+                  "                \"duration\": 190,\r",
+                  "                \"rate\": 4,\r",
+                  "                \"mpa\": { \"id\": 5},\r",
+                  "                \"directors\": [{ \"id\": director.id}]\r",
+                  "            })},\r",
+                  "          } , (error, response) => {\r",
+                  "\r",
+                  "        });\r",
+                  "        pm.sendRequest({\r",
+                  "            url : \"http://localhost:8080/films/\" + film2.id + \"/like/\" + user1.id,\r",
+                  "            method : \"PUT\"\r",
+                  "            \r",
+                  "          } , (error, response) => {\r",
+                  "\r",
+                  "        });\r",
+                  "        pm.collectionVariables.set(\"film1\", film1);\r",
+                  "        pm.collectionVariables.set(\"film2\", film2);\r",
+                  "        pm.collectionVariables.set(\"director\", director);\r",
+                  "        pm.collectionVariables.set(\"director_id\", director.id);\r",
+                  "\r",
+                  "\r",
+                  "    } catch(err) {\r",
+                  "        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+                  "    }\r",
+                  "\r",
+                  "};\r",
+                  "\r",
+                  "const interval = setInterval(() => {}, 1000);\r",
+                  "\r",
+                  "setTimeout(async () => \r",
+                  "    {\r",
+                  "        try {\r",
+                  "            await main();\r",
+                  "        } catch (e) {\r",
+                  "            console.error(e);\r",
+                  "        } finally {\r",
+                  "            clearInterval(interval);\r",
+                  "        }\r",
+                  "    },  \r",
+                  "    100 \r",
+                  ");"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "*/*"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/films/director/:directorId?sortBy=likes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "films",
+                "director",
+                ":directorId"
+              ],
+              "query": [
+                {
+                  "key": "sortBy",
+                  "value": "likes"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "directorId",
+                  "value": "{{director_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
     }
   ],
   "event": [
@@ -4985,130 +6160,173 @@
       "listen": "prerequest",
       "script": {
         "type": "text/javascript",
+        "packages": {},
         "exec": [
-          "API = class {",
-          "    constructor(postman, verbose = false, baseUrl = \"http://localhost:8080\") {",
-          "        this.baseUrl = baseUrl;",
-          "        this.pm = postman;",
-          "        this._verbose = verbose;",
-          "    }",
-          "",
-          "    async addUser(user, verbose=null) {",
-          "        return this.post(\"/users\", user, \"Ошибка при добавлении нового пользователя: \", verbose);",
-          "    }",
-          "",
-          "    async addFilm(film, verbose=null) {",
-          "        return this.post(\"/films\", film, \"Ошибка при добавлении нового фильма: \", verbose);",
-          "    }",
-          "",
-          "    async addFriend(userId, friendId, verbose=null) {",
-          "        return this.put(\"/users/\" + userId + '/friends/' + friendId, null, \"Ошибка при добавлении нового фильма: \", verbose);",
-          "    }",
-          "",
-          "    async addLike(filmId, userId, verbose=null) {",
-          "        return this.put(\"/films/\" + filmId + '/like/' + userId, null, \"Ошибка при добавлении лайка на фильм: \", verbose);",
-          "    }",
-          "",
-          "    async getFriends(userId, verbose=null) {",
-          "        return this.get('/users/' + userId + '/friends', null, \"Ошибка при поиске друзей по id пользователя\", verbose);",
-          "    }",
-          "",
-          "    async post(path, body, errorText = \"Ошибка при выполнении post-запроса: \", verbose=null) {",
-          "        return this.sendRequest(\"POST\", path, body, errorText, verbose);",
-          "    }",
-          "",
-          "    async patch(path, body = null, errorText = \"Ошибка при выполнении patch-запроса: \", verbose=null) {",
-          "        return this.sendRequest(\"PATCH\", path, body, errorText, verbose);",
-          "    }",
-          "",
-          "    async get(path, body = null, errorText = \"Ошибка при выполнении get-запроса: \", verbose=null) {",
-          "        return this.sendRequest(\"GET\", path, body, errorText, verbose);",
-          "    }",
-          "",
-          "    async put(path, body = null, errorText = \"Ошибка при выполнении put-запроса: \", verbose=null) {",
-          "        return this.sendRequest(\"PUT\", path, body, errorText, verbose);",
-          "    }",
-          "",
-          "    async sendRequest(method, path, body=null, errorText = \"Ошибка при выполнении запроса: \", verbose=null) {",
-          "        return new Promise((resolve, reject) => {",
-          "            verbose = verbose == null ? this._verbose : verbose;",
-          "            const request = {",
-          "                url: this.baseUrl + path,",
-          "                method: method,",
-          "                body: body == null ? \"\" : JSON.stringify(body),",
-          "                header: { \"Content-Type\": \"application/json\" },",
-          "            };",
-          "            if(verbose) {",
-          "                console.log(\"Отправляю запрос: \", request);",
-          "            }",
-          "",
-          "            try {",
-          "                this.pm.sendRequest(request, (error, response) => {",
-          "                    if(error || (response.code >= 400 && response.code <= 599)) {",
-          "                        let err = error ? error : JSON.stringify(response.json());",
-          "                        console.error(\"При выполнении запроса к серверу возникла ошика.\\n\", err,",
-          "                             \"\\nДля отладки проблемы повторите такой же запрос к вашей программе \" + ",
-          "                             \"на локальном компьютере. Данные запроса:\\n\", JSON.stringify(request));",
-          "",
-          "                        reject(new Error(errorText + err));",
-          "                    }",
-          "                    if(verbose) {",
-          "                        console.log(\"Результат обработки запроса: код состояния - \", response.code, \", тело: \", response.json());",
-          "                    }",
-          "                    if (response.stream.length === 0){",
-          "                        resolve(null);",
-          "                    }else{",
-          "                        resolve(response.json());",
-          "                    }",
-          "                });",
-          "                ",
-          "            } catch(err) {",
-          "                if(verbose) {",
-          "                    console.error(errorText, err);",
-          "                }",
-          "                return Promise.reject(err);",
-          "            }",
-          "        });",
-          "    }",
-          "};",
-          "",
-          "RandomUtils = class {",
-          "    constructor() {}",
-          "",
-          "    getUser() {",
-          "        let date = new Date(new Date(1960, 0, 1).getTime() + Math.random() * (new Date(2010, 0, 1).getTime() - new Date(1960, 0, 1).getTime()));",
-          "        return {",
-          "            name: pm.variables.replaceIn('{{$randomFullName}}'),",
-          "            login: this.getWord(10),",
-          "            email: pm.variables.replaceIn('{{$randomEmail}}'),",
-          "            birthday: date.toISOString().slice(0,10)",
-          "        };",
-          "    }",
-          "",
-          "    getFilm() {",
-          "        let date = new Date(new Date(1960, 0, 1).getTime() + Math.random() * (new Date(2010, 0, 1).getTime() - new Date(1960, 0, 1).getTime()));",
-          "        return {",
-          "            name: this.getWord(15),",
-          "            description: this.getWord(50),",
-          "            releaseDate: date.toISOString().slice(0,10),",
-          "            duration: Math.floor(Math.random() * (180 - 60 + 1) + 60),",
-          "            mpa: { id: Math.floor(Math.random() * (5 - 1 + 1) + 1)},",
-          "            genres: [{ id: Math.floor(Math.random() * (6 - 1 + 1) + 1)}]",
-          "        };",
-          "    }",
-          "",
-          "    getWord(length = 1) {",
-          "        let result = '';",
-          "        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';",
-          "        const charactersLength = characters.length;",
-          "        let counter = 0;",
-          "        while (counter < length) {",
-          "            result += characters.charAt(Math.floor(Math.random() * charactersLength));",
-          "            counter += 1;",
-          "        }",
-          "        return result;",
-          "    }",
-          "",
+          "API = class {\r",
+          "    constructor(postman, verbose = false, baseUrl = \"http://localhost:8080\") {\r",
+          "        this.baseUrl = baseUrl;\r",
+          "        this.pm = postman;\r",
+          "        this._verbose = verbose;\r",
+          "    }\r",
+          "\r",
+          "    async addUser(user, verbose=null) {\r",
+          "        return this.post(\"/users\", user, \"Ошибка при добавлении нового пользователя: \", verbose);\r",
+          "    }\r",
+          "\r",
+          "    async removeUser(userId, verbose=null) {\r",
+          "        return this.delete(\"/users/\" + userId, \"Ошибка при удалении нового пользователя: \", verbose);\r",
+          "    }\r",
+          "\r",
+          "    async addFilm(film, verbose=null) {\r",
+          "        return this.post(\"/films\", film, \"Ошибка при добавлении нового фильма: \", verbose);\r",
+          "    }\r",
+          "\r",
+          "    async removeFilm(filmId, verbose=null) {\r",
+          "        return this.delete(\"/films/\" + filmId, null, \"Ошибка при удалении фильма: \", verbose);\r",
+          "    }\r",
+          "\r",
+          "    async addFriend(userId, friendId, verbose=null) {\r",
+          "        return this.put(\"/users/\" + userId + '/friends/' + friendId, null, \"Ошибка при добавлении нового фильма: \", verbose);\r",
+          "    }\r",
+          "\r",
+          "    async addDirector(director, verbose=null) {\r",
+          "        return this.post(\"/directors\", director, null, \"Ошибка при добавлении нового режиссера: \", verbose);\r",
+          "    }\r",
+          "\r",
+          "    async addLike(filmId, userId, verbose=null) {\r",
+          "        return this.put(\"/films/\" + filmId + '/like/' + userId, null, \"Ошибка при добавлении лайка на фильм: \", verbose);\r",
+          "    }\r",
+          "\r",
+          "    async removeLike(filmId, userId, verbose=null) {\r",
+          "        return this.delete(\"/films/\" + filmId + '/like/' + userId, null, \"Ошибка при удалении лайка на фильм: \", verbose);\r",
+          "    }\r",
+          "\r",
+          "    async getFriends(userId, verbose=null) {\r",
+          "        return this.get('/users/' + userId + '/friends', null, \"Ошибка при поиске друзей по id пользователя\", verbose);\r",
+          "    }\r",
+          "\r",
+          "    async getPopular(verbose=null) {\r",
+          "        return this.get('/films/popular?count=1000', null, \"Ошибка при поиске популярных фильмов\", verbose);\r",
+          "    }\r",
+          "\r",
+          "    async post(path, body, errorText = \"Ошибка при выполнении post-запроса: \", verbose=null) {\r",
+          "        return this.sendRequest(\"POST\", path, body, errorText, verbose);\r",
+          "    }\r",
+          "\r",
+          "    async patch(path, body = null, errorText = \"Ошибка при выполнении patch-запроса: \", verbose=null) {\r",
+          "        return this.sendRequest(\"PATCH\", path, body, errorText, verbose);\r",
+          "    }\r",
+          "\r",
+          "    async get(path, body = null, errorText = \"Ошибка при выполнении get-запроса: \", verbose=null) {\r",
+          "        return this.sendRequest(\"GET\", path, body, errorText, verbose);\r",
+          "    }\r",
+          "\r",
+          "    async put(path, body = null, errorText = \"Ошибка при выполнении put-запроса: \", verbose=null) {\r",
+          "        return this.sendRequest(\"PUT\", path, body, errorText, verbose);\r",
+          "    }\r",
+          "\r",
+          "    async delete(path, body = null, errorText = \"Ошибка при выполнении delte-запроса: \", verbose=null) {\r",
+          "        return this.sendRequest(\"DELETE\", path, body, errorText, verbose);\r",
+          "    }\r",
+          "\r",
+          "    async sendRequest(method, path, body=null, errorText = \"Ошибка при выполнении запроса: \", verbose=null) {\r",
+          "        return new Promise((resolve, reject) => {\r",
+          "            verbose = verbose == null ? this._verbose : verbose;\r",
+          "            const request = {\r",
+          "                url: this.baseUrl + path,\r",
+          "                method: method,\r",
+          "                body: body == null ? \"\" : JSON.stringify(body),\r",
+          "                header: { \"Content-Type\": \"application/json\" },\r",
+          "            };\r",
+          "            if(verbose) {\r",
+          "                console.log(\"Отправляю запрос: \", request);\r",
+          "            }\r",
+          "\r",
+          "            try {\r",
+          "                this.pm.sendRequest(request, (error, response) => {\r",
+          "                    if(error || (response.code >= 400 && response.code <= 599)) {\r",
+          "                        let err = error ? error : JSON.stringify(response.json());\r",
+          "                        console.error(\"При выполнении запроса к серверу возникла ошика.\\n\", err,\r",
+          "                             \"\\nДля отладки проблемы повторите такой же запрос к вашей программе \" + \r",
+          "                             \"на локальном компьютере. Данные запроса:\\n\", JSON.stringify(request));\r",
+          "\r",
+          "                        reject(new Error(errorText + err));\r",
+          "                    }\r",
+          "                    if(verbose) {\r",
+          "                        console.log(\"Результат обработки запроса: код состояния - \", response.code, \", тело: \", response.json());\r",
+          "                    }\r",
+          "                    if (response.stream.length === 0){\r",
+          "                        resolve(null);\r",
+          "                    }else{\r",
+          "                        resolve(response.json());\r",
+          "                    }\r",
+          "                });\r",
+          "                \r",
+          "            } catch(err) {\r",
+          "                if(verbose) {\r",
+          "                    console.error(errorText, err);\r",
+          "                }\r",
+          "                return Promise.reject(err);\r",
+          "            }\r",
+          "        });\r",
+          "    }\r",
+          "};\r",
+          "\r",
+          "RandomUtils = class {\r",
+          "    constructor() {}\r",
+          "    getUser() {\r",
+          "        let date = new Date(new Date(1960, 0, 1).getTime() + Math.random() * (new Date(2010, 0, 1).getTime() - new Date(1960, 0, 1).getTime()));\r",
+          "        return {\r",
+          "            name: pm.variables.replaceIn('{{$randomFullName}}'),\r",
+          "            login: this.getWord(10),\r",
+          "            email: pm.variables.replaceIn('{{$randomEmail}}'),\r",
+          "            birthday: date.toISOString().slice(0,10)\r",
+          "        };\r",
+          "    }\r",
+          "\r",
+          "    getFilm(directors=[]) {\r",
+          "        let date = new Date(new Date(1960, 0, 1).getTime() + Math.random() * (new Date(2010, 0, 1).getTime() - new Date(1960, 0, 1).getTime()));\r",
+          "        var toReturn = {\r",
+          "            name: this.getWord(15),\r",
+          "            description: this.getWord(50),\r",
+          "            releaseDate: date.toISOString().slice(0,10),\r",
+          "            duration: Math.floor(Math.random() * (180 - 60 + 1) + 60),\r",
+          "            mpa: { id: Math.floor(Math.random() * (5 - 1 + 1) + 1)},\r",
+          "            genres: [{ id: Math.floor(Math.random() * (6 - 1 + 1) + 1)}]\r",
+          "        };\r",
+          "        if (directors.length > 0) {\r",
+          "            toReturn.directors = [{ id: director.id}];\r",
+          "        } else {\r",
+          "            toReturn.directors = [];\r",
+          "        }\r",
+          "        return toReturn;\r",
+          "    }\r",
+          "\r",
+          "\r",
+          "    getWord(length = 1) {\r",
+          "        let result = '';\r",
+          "        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';\r",
+          "        const charactersLength = characters.length;\r",
+          "        let counter = 0;\r",
+          "        while (counter < length) {\r",
+          "            result += characters.charAt(Math.floor(Math.random() * charactersLength));\r",
+          "            counter += 1;\r",
+          "        }\r",
+          "        return result;\r",
+          "    }\r",
+          "\r",
+          "        getName(length = 1) {\r",
+          "        let result = '';\r",
+          "        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';\r",
+          "        const charactersLength = characters.length;\r",
+          "        let counter = 0;\r",
+          "        while (counter < length) {\r",
+          "            result += characters.charAt(Math.floor(Math.random() * charactersLength));\r",
+          "            counter += 1;\r",
+          "        }\r",
+          "        return result;\r",
+          "    }\r",
+          "\r",
           "}"
         ]
       }
@@ -5117,6 +6335,7 @@
       "listen": "test",
       "script": {
         "type": "text/javascript",
+        "packages": {},
         "exec": [
           ""
         ]
@@ -5134,6 +6353,46 @@
       "value": ""
     },
     {
+      "key": "source",
+      "value": ""
+    },
+    {
+      "key": "director",
+      "value": ""
+    },
+    {
+      "key": "film_id",
+      "value": ""
+    },
+    {
+      "key": "film",
+      "value": ""
+    },
+    {
+      "key": "director_id",
+      "value": ""
+    },
+    {
+      "key": "name_to_change",
+      "value": ""
+    },
+    {
+      "key": "film1",
+      "value": ""
+    },
+    {
+      "key": "film2",
+      "value": ""
+    },
+    {
+      "key": "user",
+      "value": ""
+    },
+    {
+      "key": "new_user_info",
+      "value": ""
+    },
+    {
       "key": "friend_id",
       "value": ""
     },
@@ -5146,10 +6405,6 @@
       "value": ""
     },
     {
-      "key": "film",
-      "value": ""
-    },
-    {
       "key": "film1_id",
       "value": ""
     },
@@ -5159,22 +6414,6 @@
     },
     {
       "key": "film3_id",
-      "value": ""
-    },
-    {
-      "key": "source",
-      "value": ""
-    },
-    {
-      "key": "user",
-      "value": ""
-    },
-    {
-      "key": "film_id",
-      "value": ""
-    },
-    {
-      "key": "new_user_info",
       "value": ""
     }
   ]

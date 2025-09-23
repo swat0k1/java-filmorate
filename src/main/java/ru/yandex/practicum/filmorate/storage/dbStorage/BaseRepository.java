@@ -66,10 +66,25 @@ public class BaseRepository<T> {
         return jdbc.query(query, rowMapper, params);
     }
 
+    protected List<Integer> findList(String query, Object... params) {
+        return jdbc.queryForList(query, Integer.class, params);
+    }
+
     protected void batchUpdateBase(String query, BatchPreparedStatementSetter bps) {
         int[] rowsUpdated = jdbc.batchUpdate(query, bps);
         if (rowsUpdated.length == 0) {
             throw new FindingException("Ошибка обновления данных");
         }
+    }
+
+    protected void delete(String query, int id) {
+        int rowsDeleted = jdbc.update(query, id);
+        if (rowsDeleted == 0) {
+            throw new InternalServerException("Ошибка удаления данных");
+        }
+    }
+
+    protected List<T> search(String query, Object... params) {
+        return jdbc.query(query, rowMapper, params);
     }
 }

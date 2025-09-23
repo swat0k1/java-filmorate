@@ -15,24 +15,24 @@ import java.util.*;
 public class FriendDbStorage extends BaseRepository<User> {
 
     private static final String ADD = "INSERT " +
-                                        "INTO user_friends (user_id, friend_id) " +
-                                        "VALUES (?, ?)";
+            "INTO user_friends (user_id, friend_id) " +
+            "VALUES (?, ?)";
 
     private static final String FIND_FRIENDS_BY_ID = "SELECT friend_id " +
-                                                    "FROM user_friends " +
-                                                    "WHERE user_id = ?";
+            "FROM user_friends " +
+            "WHERE user_id = ?";
 
     private static final String FIND_ALL_FRIENDS = "SELECT * " +
-                                                    "FROM user_friends";
+            "FROM user_friends";
 
     private static final String DELETE = "DELETE " +
-                                            "FROM user_friends " +
-                                            "WHERE user_id = ? AND friend_id = ?";
+            "FROM user_friends " +
+            "WHERE user_id = ? AND friend_id = ?";
 
     private static final String DELETE_ALL_USER_FRIENDS = "DELETE " +
-                                                        "FROM user_friends " +
-                                                        "WHERE user_id = ? " +
-                                                        "OR friend_id = ?";
+            "FROM user_friends " +
+            "WHERE user_id = ? " +
+            "OR friend_id = ?";
 
     public FriendDbStorage(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper, User.class);
@@ -69,9 +69,5 @@ public class FriendDbStorage extends BaseRepository<User> {
         } catch (InternalServerException e) {
             throw new FindingException(e.getMessage());
         }
-    }
-
-    public void deleteAllUserFriends(int userId) {
-        update(DELETE_ALL_USER_FRIENDS, userId, userId);
     }
 }

@@ -18,38 +18,41 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
     private FriendDbStorage friendDbStorage;
 
     private static final String INSERT = "INSERT " +
-                                            "INTO users (email, login, name, birthday) " +
-                                            "VALUES (?, ?, ?, ?)";
+            "INTO users (email, login, name, birthday) " +
+            "VALUES (?, ?, ?, ?)";
 
     private static final String UPDATE = "UPDATE users " +
-                                            "SET email = ?, login = ?, " +
-                                            "name = ?, birthday = ? " +
-                                            "WHERE id = ?";
+            "SET email = ?, login = ?, " +
+            "name = ?, birthday = ? " +
+            "WHERE id = ?";
 
     private static final String FIND_ALL = "SELECT * " +
-                                            "FROM users";
+            "FROM users";
 
     private static final String FIND_BY_ID = "SELECT * " +
-                                                "FROM users " +
-                                                "WHERE id = ?";
+            "FROM users " +
+            "WHERE id = ?";
 
     private static final String DELETE = "DELETE " +
-                                            "FROM users " +
-                                            "WHERE id = ?";
+            "FROM users " +
+            "WHERE id = ?";
 
     private static final String FIND_MANY = "SELECT * " +
-                                                "FROM users " +
-                                                "WHERE id IN (%s)";
+            "FROM users " +
+            "WHERE id IN (%s)";
 
     private static final String FIND_COMMON_FRIENDS = "SELECT id " +
-                                                        "FROM users " +
-                                                        "WHERE id IN " +
-                                                            "(SELECT friend_id " +
-                                                            "FROM user_friends " +
-                                                            "WHERE user_id = ?) AND id IN " +
-                                                            "(SELECT friend_id " +
-                                                            "FROM user_friends " +
-                                                            "WHERE user_id = ?);";
+            "FROM users " +
+            "WHERE id IN " +
+            "(SELECT friend_id " +
+            "FROM user_friends " +
+            "WHERE user_id = ?) AND id IN " +
+            "(SELECT friend_id " +
+            "FROM user_friends " +
+            "WHERE user_id = ?);";
+
+    private static final String FIND_ALL_USER_LIKES = "SELECT * " +
+            "FROM film_likes";
 
     public UserDbStorage(JdbcTemplate jdbc, RowMapper<User> mapper, FriendDbStorage friendDbStorage) {
         super(jdbc, mapper, User.class);
@@ -58,6 +61,9 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
 
     @Override
     public User createUser(User user) {
+        if (user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
         int id = insert(
                 INSERT,
                 user.getEmail(),
@@ -107,8 +113,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
     @Override
     public User deleteUser(int id) {
         User user = getUserById(id);
-        if (!user.getFriends().isEmpty()) friendDbStorage.deleteAllUserFriends(id);
-        update(DELETE, id);
+        delete(DELETE, id);
         return user;
     }
 
@@ -133,5 +138,54 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
     public Collection<User> getCommonFriends(int firstUserId, int secondUserId) {
         Collection<Integer> friends = jdbc.queryForList(FIND_COMMON_FRIENDS, Integer.TYPE, firstUserId, secondUserId);
         return findMany(friends);
+    }
+
+    public Set<Integer> getRecommendations(int id) {
+        // Карта, в которой ключ = id пользователя, а значение = множество id фильмов, которые он лайкнул
+        HashMap<Integer, Set<Integer>> allUsersLike = new HashMap<>();
+        jdbc.query(FIND_ALL_USER_LIKES, rs -> {
+            // Возврат id пользователя
+            int userId = rs.getInt("user_liked_id");
+            // Заполнение карты данными из БД
+            Set<Integer> usersLikes = allUsersLike.computeIfAbsent(userId, key -> new HashSet<>());
+            usersLikes.add(rs.getInt("film_id"));
+        });
+
+        // Множество id фильмов, которые лайкнул пользователь
+        Set<Integer> usersLike = allUsersLike.get(id);
+        if (usersLike == null) {
+            return new HashSet<>();
+        }
+
+        // Находим множество id фильмов другого пользователя с максимальным количеством совпадений
+        Set<Integer> maxMatchLike = null;
+        int maxMatches = 0;
+
+        for (Map.Entry<Integer, Set<Integer>> entry : allUsersLike.entrySet()) {
+            Set<Integer> currentSetLike = entry.getValue();
+            // Исключаем сравнение с самим собой,
+            // либо с пользователем с абсолютно одинаковыми лайками, так как рекомендовать тогда нечего
+            if (!currentSetLike.equals(usersLike)) {
+                int matches = (int) currentSetLike.stream()
+                        .filter(usersLike::contains)
+                        .count();
+                if (matches > maxMatches) {
+                    maxMatches = matches;
+                    maxMatchLike = currentSetLike;
+                }
+            }
+        }
+        if (maxMatches == 0) {
+            return new HashSet<>();
+        }
+
+        // Исключаем из найденного множества элементы из usersLike
+        if (maxMatchLike != null) {
+            maxMatchLike.removeAll(usersLike);
+        }
+        if (maxMatches == 0) {
+            return new HashSet<>();
+        }
+        return maxMatchLike;
     }
 }

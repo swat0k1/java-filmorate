@@ -8,15 +8,9 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.dbStorage.*;
-import ru.yandex.practicum.filmorate.storage.mappers.FilmRowMapper;
-import ru.yandex.practicum.filmorate.storage.mappers.GenreRowMapper;
-import ru.yandex.practicum.filmorate.storage.mappers.MpaRowMapper;
-import ru.yandex.practicum.filmorate.storage.mappers.UserRowMapper;
+import ru.yandex.practicum.filmorate.storage.mappers.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -36,15 +30,17 @@ import static org.assertj.core.api.Assertions.assertThat;
         GenreRowMapper.class,
         UserDbStorage.class,
         UserRowMapper.class,
-        FriendDbStorage.class})
-@JdbcTest
+        FriendDbStorage.class,
+        DirectorDbStorage.class,
+        DirectorRowMapper.class,
+})
 
+@JdbcTest
 public class FilmDbStorageTest {
 
     private final FilmDbStorage filmDbStorage;
     private final LikeDbStorage likeDbStorage;
     private final UserDbStorage userDbStorage;
-    private final GenreDbStorage genreDbStorage;
 
     private Film film1;
     private Film film2;
@@ -64,6 +60,10 @@ public class FilmDbStorageTest {
         Set<Genre> genres = new HashSet<>();
         genres.add(new Genre(1, "test"));
         film1.setGenres(genres);
+
+        Set<Director> directors = new HashSet<>();
+        directors.add(new Director(1, "director1"));
+        film1.setDirectors(directors);
 
         film2 = new Film();
         film2.setId(2);
@@ -117,7 +117,7 @@ public class FilmDbStorageTest {
         userDbStorage.createUser(user1);
         likeDbStorage.addLike(1, 1);
 
-        Film film = filmDbStorage.getTopFilms(1).iterator().next();
+        Film film = filmDbStorage.getTopFilms(1, 1, 2000).iterator().next();
         assertThat(film).hasFieldOrPropertyWithValue("name", "TestName");
     }
 }

@@ -12,10 +12,10 @@ import java.util.Optional;
 public class MpaDbStorage extends BaseRepository<Mpa> {
 
     private static final String FIND_BY_ID = "SELECT * " +
-                                                "FROM rating_MPA " +
-                                                "WHERE mpa_id = ?";
+            "FROM rating_MPA " +
+            "WHERE mpa_id = ?";
     private static final String FIND_ALL = "SELECT * " +
-                                            "FROM rating_MPA";
+            "FROM rating_MPA";
 
     public MpaDbStorage(JdbcTemplate jdbc, RowMapper<Mpa> mapper) {
         super(jdbc, mapper, Mpa.class);

@@ -8,10 +8,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserFeed;
+import ru.yandex.practicum.filmorate.service.UserFeedService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.util.*;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/users")
@@ -22,6 +25,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserFeedService userFeedService;
 
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
@@ -76,4 +81,15 @@ public class UserController {
         return new ResponseEntity<>(commonFriends, HttpStatus.OK);
     }
 
+    @GetMapping("/{id}/recommendations")
+    public ResponseEntity<Collection<Film>> getRecommendations(@PathVariable("id") int id) {
+        Collection<Film> recommendedFilms = userService.getRecommendations(id);
+        return new ResponseEntity<>(recommendedFilms, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/feed")
+    public ResponseEntity<Collection<UserFeed>> getUserFeeds(@PathVariable("id") int id) {
+        Collection<UserFeed> userFeed = userFeedService.getUserFeed(id);
+        return new ResponseEntity<>(userFeed, HttpStatus.OK);
+    }
 }
